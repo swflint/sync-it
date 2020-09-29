@@ -14,18 +14,20 @@
       rec {
         packages = rec {
 
-          # sync-it = pkgs.rustPlatform.buildRustPackage rec {
-          #   name = "sync-it";
-          #   version = "0.0.1";
+          sync-it = pkgs.rustPlatform.buildRustPackage rec {
+            name = "sync-it";
+            version = "0.0.1";
 
-          #   cargoSha256 = "XXX";
+            src = ./.;
 
-          #   meta = with pkgs.stdenv.lib; {
-          #     description = "A simple, customizable synchronization tool.";
-          #     license = licenses.gpl3OrLater;
-          #     maintainers = with maintainers; [ swflint ];
-          #   };
-          # };
+            cargoSha256 = "HdlX0U0ikiKLGPLqN8afagrgr37BfaGfEibquZDhvbg=";
+
+            meta = with pkgs.stdenv.lib; {
+              description = "A simple, customizable synchronization tool.";
+              license = licenses.gpl3Plus;
+              maintainers = with maintainers; [ swflint ];
+            };
+          };
 
           devEnvironment = pkgs.mkShell {
             name = "sync-it-dev-environment";
@@ -41,6 +43,7 @@
 
         };
 
+        defaultPackage = packages.sync-it;
         devShell = packages.devEnvironment;
       }
     );
