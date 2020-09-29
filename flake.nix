@@ -34,6 +34,8 @@
               pkgs.pre-commit
               pkgs.rustc
               pkgs.cargo
+              pkgs.rls
+              pkgs.clippy
             ];
           };
 
