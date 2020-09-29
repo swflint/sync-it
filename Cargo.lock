@@ -76,6 +76,7 @@ dependencies = [
  "clap",
  "serde",
  "toml",
+ "yaml-rust",
 ]
 
 [[package]]
