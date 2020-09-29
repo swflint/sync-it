@@ -49,3 +49,8 @@ flycheck_*.el
 # projectiles files
 .projectile
 
+
+
+#Added by cargo
+
+/target
