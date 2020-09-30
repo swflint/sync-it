@@ -18,6 +18,23 @@ pub struct Repository {
     options: HashMap<String, String>,
 }
 
+pub fn register(config: &mut Config, name: &String, location: String, repo_type: String, options_strings: Vec<String>) {
+    let mut options_map: HashMap<String, String> = HashMap::new();
+    for option in options_strings {
+        let option_pair: Vec<&str> = option.split("=").collect();
+        options_map.insert(option_pair[0].to_string(), option_pair[1].to_string());
+    }
+    let repo = Repository {
+        name: name.to_string(),
+        location: location,
+        repo_type: repo_type,
+        auto_create: true,
+        disabled: false,
+        options: options_map
+    };
+    config.repositories.insert(name.to_string(), repo);
+}
+
 impl fmt::Display for Repository {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Repository {}:\n\tPath: {}\n\tType: {}\n\tDisabled: {}\n\tOptions:\n",
