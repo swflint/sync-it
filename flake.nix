@@ -38,6 +38,7 @@
               pkgs.cargo
               pkgs.rls
               pkgs.clippy
+              pkgs.rustfmt
             ];
           };
 
