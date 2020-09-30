@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::path::PathBuf;
 
 #[derive(Serialize, Deserialize)]
 pub struct Config {
@@ -61,4 +62,11 @@ pub struct Group {
     actions_after: Vec<String>,
     #[serde(default)]
     members: Vec<String>,
+}
+
+pub fn find_config_file(original: Option<&str>) -> PathBuf {
+    match original {
+        None => return PathBuf::from("~/.sync-it"),
+        Some(p) => return PathBuf::from(&p),
+    }
 }
