@@ -39,6 +39,7 @@
               pkgs.rls
               pkgs.clippy
               pkgs.rustfmt
+              pkgs.sloc
             ];
           };
 
