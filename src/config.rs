@@ -7,6 +7,7 @@ use std::fs::{
 };
 use std::io::Write;
 
+use home::home_dir;
 #[derive(Serialize, Deserialize)]
 pub struct Config {
     #[serde(rename(serialize = "repo_type", deserialize = "repo_type"), default)]
@@ -72,11 +73,13 @@ pub struct Group {
 pub fn find_config_file(original: Option<&str>) -> PathBuf {
     match original {
         None => {
-            if PathBuf::from("~/.config/sync-it/config.toml").exists() {
-                return PathBuf::from("~/.config/sync-it/config.toml");
-            } else {
-                return PathBuf::from("~/.sync-it");
+            let config_name = PathBuf::from(".config/sync-it/config.toml");
+            let mut path_name = home_dir().unwrap().join(config_name);
+            if path_name.exists() {
+                return path_name;
             }
+            path_name = home_dir().unwrap().join(PathBuf::from(".sync-it.toml"));
+            return path_name;
         },
         Some(p) => return PathBuf::from(&p),
     }
