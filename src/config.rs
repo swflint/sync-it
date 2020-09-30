@@ -97,3 +97,10 @@ pub fn read_configuration_file(filename: PathBuf) -> Config {
         Ok(s) => return toml::from_str(&s).unwrap()
     }
 }
+
+pub fn write_configuration_file(filename: PathBuf, configuration: Config) -> std::io::Result<()> {
+    let toml = toml::to_string(&configuration).unwrap();
+    let mut file = File::create(filename)?;
+    file.write_all(toml.as_bytes())?;
+    Ok(())
+}
