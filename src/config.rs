@@ -66,7 +66,13 @@ pub struct Group {
 
 pub fn find_config_file(original: Option<&str>) -> PathBuf {
     match original {
-        None => return PathBuf::from("~/.sync-it"),
+        None => {
+            if PathBuf::from("~/.config/sync-it/config.toml").exists() {
+                return PathBuf::from("~/.config/sync-it/config.toml");
+            } else {
+                return PathBuf::from("~/.sync-it");
+            }
+        },
         Some(p) => return PathBuf::from(&p),
     }
 }
