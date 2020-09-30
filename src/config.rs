@@ -1,7 +1,11 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
-use std::fs;
+use std::fs::{
+    File,
+    read_to_string
+};
+use std::io::Write;
 
 #[derive(Serialize, Deserialize)]
 pub struct Config {
@@ -79,7 +83,7 @@ pub fn find_config_file(original: Option<&str>) -> PathBuf {
 }
 
 pub fn read_configuration_file(filename: PathBuf) -> Config {
-    let text = fs::read_to_string(filename);
+    let text = read_to_string(filename);
     match text {
         Err(_) => {
             let mut config = Config {
