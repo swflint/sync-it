@@ -70,9 +70,9 @@ impl fmt::Display for Repository {
                self.name,
                self.location,
                self.repo_type,
-               self.disabled);
+               self.disabled)?;
         for (key, value) in &self.options {
-            write!(f, "\t\t{}: {}\n", key, value);
+            write!(f, "\t\t{}: {}\n", key, value)?;
         }
         write!(f, "")
     }

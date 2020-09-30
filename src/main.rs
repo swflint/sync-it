@@ -71,5 +71,8 @@ fn main() {
         _ => println!("No subcommand."),
     }
 
-    write_configuration_file(config_file, configuration);
+    match write_configuration_file(config_file, configuration) {
+        Err(err) => panic!("Error writing configuration: {}.", err),
+        _ => {}
+    }
 }
