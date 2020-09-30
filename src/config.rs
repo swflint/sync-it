@@ -82,7 +82,7 @@ pub fn find_config_file(original: Option<&str>) -> PathBuf {
     }
 }
 
-pub fn read_configuration_file(filename: PathBuf) -> Config {
+pub fn read_configuration_file(filename: &PathBuf) -> Config {
     let text = read_to_string(filename);
     match text {
         Err(_) => {
