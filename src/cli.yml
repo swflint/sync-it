@@ -1,7 +1,7 @@
 name: sync-it
 version: "0.1.0"
 author: Samuel W. Flint <swflint@flintfam.org>
-about: Does awesome things
+about: Synchronize directories flexibly
 settings:
   - SubcommandRequired
 args:
@@ -11,18 +11,239 @@ args:
         value_name: FILE
         help: Sets a custom config file
         takes_value: true
+    - license:
+        short: l
+        long: license
+        help: Shows license
+        takes_value: false
 subcommands:
   - run:
-      about: runs a group
+      about: Run sychronization for repositories and groups
+      aliases:
+        - sync
+        - rr
       args:
         - name:
             index: 1
             multiple: true
-  # - test:
-  #       about: controls testing features
-  #       version: "1.3"
-  #       author: Someone E. <someone_else@other.com>
-  #       args:
-  #           - debug:
-  #               short: d
-  #               help: print debug information
+            value_name: REPO_OR_GROUP
+            help: The name of a repository or group to sync
+  - repository:
+      about: Create and manage repositories
+      settings:
+        - SubcommandRequired
+      aliases:
+        - repo
+        - r
+      subcommands:
+        - register:
+            about: Register the current directory as a repository
+            args:
+              - type:
+                  index: 1
+                  value_name: REPO_TYPE
+                  help: The type of repository
+                  required: true
+              - name:
+                  index: 2
+                  value_name: REPO_NAME
+                  help: The name of the repository
+                  required: true
+              - options:
+                  index: 3
+                  value_name: OPTION
+                  help: Type-specific options, in form "name=value"
+                  multiple: true
+        - config:
+            about: Configure a repository
+            args:
+              - name:
+                  index: 1
+                  value_name: NAME
+                  help: The name of the repository
+                  required: true
+              - autocreate:
+                  long: autocreate
+                  value_name: YES/NO
+                  help: Enable autocreation
+                  takes_value: true
+                  multiple: false
+              - disable:
+                  long: disable
+                  value_name: YES/NO
+                  help: Disable repository
+                  takes_value: true
+                  multiple: false
+              - options:
+                  long: options
+                  value_name: OPTION=VALUE
+                  help: Type-specific options
+                  multiple: true
+                  takes_value: true
+        - show:
+            about: Show information about a repository
+            args:
+              - name:
+                  index: 1
+                  value_name: NAME
+                  help: The name of the repository
+                  required: true
+  - group:
+      about: Create and manage groups of repositories
+      settings:
+        - SubcommandRequired
+      subcommands:
+        - create:
+            about: Create a group
+            args:
+              - name:
+                  index: 1
+                  value_name: GROUP_NAME
+                  help: The name of the group
+                  required: true
+        - delete:
+            about: Delete a group
+            args:
+              - name:
+                  index: 1
+                  value_name: GROUP_NAME
+                  help: The name of the group
+                  required: true
+        - add:
+            about: Add a repo to a group
+            args:
+              - group:
+                  index: 1
+                  value_name: GROUP_NAME
+                  help: The name of the group
+                  required: true
+              - repo:
+                  index: 2
+                  value_name: REPO_NAME
+                  help: The name of the repo
+                  required: true
+        - remove:
+            about: Remove a repo from a group
+            args:
+              - group:
+                  index: 1
+                  value_name: GROUP_NAME
+                  help: The name of the group
+                  required: true
+              - repo:
+                  index: 2
+                  value_name: REPO_NAME
+                  help: The name of the repo
+                  required: true
+        - show:
+            about: Show information about a group
+            args:
+              - name:
+                  index: 1
+                  value_name: NAME
+                  help: The name of the group
+                  required: true
+  - type:
+      about: Create and manage repository types
+      settings:
+        - SubcommandRequired
+      subcommands:
+        - create:
+            about: Create a new repository type
+            args:
+              - name:
+                  index: 1
+                  value_name: NAME
+                  help: Name of the repository type
+                  required: true
+              - description:
+                  long: description
+                  takes_value: true
+                  help: Description of the repository type
+              - create:
+                  long: create
+                  takes_value: true
+                  help: Command to create a repository of type NAME
+              - inward:
+                  long: inward
+                  takes_value: true
+                  help: Command to perform inward sync of a repository of type NAME
+              - outward:
+                  long: outward
+                  takes_value: true
+                  help: Command to perform outward sync of a repository of type NAME
+        - config:
+            about: Configure a repository type
+            args:
+              - name:
+                  index: 1
+                  value_name: NAME
+                  help: Name of the repository type
+                  required: true
+              - description:
+                  long: description
+                  takes_value: true
+                  help: Description of the repository type
+              - create:
+                  long: create
+                  takes_value: true
+                  help: Command to create a repository of type NAME
+              - inward:
+                  long: inward
+                  takes_value: true
+                  help: Command to perform inward sync of a repository of type NAME
+              - outward:
+                  long: outward
+                  takes_value: true
+                  help: Command to perform outward sync of a repository of type NAME
+        - show:
+            about: Show information about a type
+            args:
+              - name:
+                  index: 1
+                  value_name: NAME
+                  help: The name of the repository type
+                  required: true
+  - action:
+      about: Create and manage actions
+      settings:
+        - SubcommandRequired
+      subcommands:
+        - create:
+            about: Create a new action
+            args:
+              - name:
+                  index: 1
+                  value_name: NAME
+                  help: The name of the action
+                  required: true
+              - command:
+                  index: 2
+                  value_name: COMMAND
+                  help: The command the action runs
+                  required: true
+        - config:
+            about: Configure an action
+            args:
+              - name:
+                  index: 1
+                  value_name: NAME
+                  help: The name of the action
+                  required: true
+              - enabled:
+                  long: enabled
+                  value_name: YES/NO
+                  help: Enable this action
+              - command:
+                  long: command
+                  value_name: COMMAND
+                  help: The command the action runs
+                  required: true
+        - show:
+            about: Show information about an action
+            args:
+              - name:
+                  index: 1
+                  value_name: NAME
+                  help: The name of the repository type
+                  required: true
