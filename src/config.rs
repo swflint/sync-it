@@ -13,6 +13,10 @@ use crate::repository::{
     Repository
 };
 
+use crate::repotype::{
+    RepoType
+};
+
 #[derive(Serialize, Deserialize)]
 pub struct Config {
     #[serde(rename(serialize = "repo_type", deserialize = "repo_type"), default)]
@@ -23,20 +27,6 @@ pub struct Config {
     actions: HashMap<String, Action>,
     #[serde(rename(serialize = "group", deserialize = "group"), default)]
     groups: HashMap<String, Group>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct RepoType {
-    #[serde(default)]
-    name: String,
-    #[serde(default)]
-    description: String,
-    #[serde(default)]
-    create: String,
-    #[serde(default)]
-    inward: String,
-    #[serde(default)]
-    outward: String,
 }
 
 #[derive(Serialize, Deserialize)]
