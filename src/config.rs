@@ -1,14 +1,14 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize)]
 pub struct Config {
     #[serde(rename(serialize = "repo_type", deserialize = "repo_type"), default)]
-    repo_types: HashMap<String,RepoType>,
+    repo_types: HashMap<String, RepoType>,
     #[serde(rename(serialize = "repository", deserialize = "repository"), default)]
-    repositories: HashMap<String,Repository>,
+    repositories: HashMap<String, Repository>,
     #[serde(rename(serialize = "action", deserialize = "action"), default)]
-    actions: HashMap<String,Action>,
+    actions: HashMap<String, Action>,
     #[serde(rename(serialize = "group", deserialize = "group"), default)]
     groups: HashMap<String, Group>,
 }
@@ -40,7 +40,7 @@ pub struct Repository {
     #[serde(default)]
     disabled: bool,
     #[serde(default)]
-    options: HashMap<String, String>
+    options: HashMap<String, String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -60,5 +60,5 @@ pub struct Group {
     #[serde(default)]
     actions_after: Vec<String>,
     #[serde(default)]
-    members: Vec<String>
+    members: Vec<String>,
 }
