@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
+use std::fs;
 
 #[derive(Serialize, Deserialize)]
 pub struct Config {
@@ -74,5 +75,21 @@ pub fn find_config_file(original: Option<&str>) -> PathBuf {
             }
         },
         Some(p) => return PathBuf::from(&p),
+    }
+}
+
+pub fn read_configuration_file(filename: PathBuf) -> Config {
+    let text = fs::read_to_string(filename);
+    match text {
+        Err(_) => {
+            let mut config = Config {
+                repo_types: HashMap::new(),
+                repositories: HashMap::new(),
+                actions: HashMap::new(),
+                groups: HashMap::new()
+            };
+            return config;
+        },
+        Ok(s) => return toml::from_str(&s).unwrap()
     }
 }
