@@ -8,12 +8,17 @@ use std::fs::{
 use std::io::Write;
 
 use home::home_dir;
+
+use crate::repository::{
+    Repository
+};
+
 #[derive(Serialize, Deserialize)]
 pub struct Config {
     #[serde(rename(serialize = "repo_type", deserialize = "repo_type"), default)]
     repo_types: HashMap<String, RepoType>,
     #[serde(rename(serialize = "repository", deserialize = "repository"), default)]
-    repositories: HashMap<String, Repository>,
+    pub repositories: HashMap<String, Repository>,
     #[serde(rename(serialize = "action", deserialize = "action"), default)]
     actions: HashMap<String, Action>,
     #[serde(rename(serialize = "group", deserialize = "group"), default)]
@@ -32,22 +37,6 @@ pub struct RepoType {
     inward: String,
     #[serde(default)]
     outward: String,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct Repository {
-    #[serde(default)]
-    name: String,
-    #[serde(default)]
-    location: String,
-    #[serde(default)]
-    repo_type: String,
-    #[serde(default)]
-    auto_create: bool,
-    #[serde(default)]
-    disabled: bool,
-    #[serde(default)]
-    options: HashMap<String, String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -89,7 +78,7 @@ pub fn read_configuration_file(filename: &PathBuf) -> Config {
     let text = read_to_string(filename);
     match text {
         Err(_) => {
-            let mut config = Config {
+            let config = Config {
                 repo_types: HashMap::new(),
                 repositories: HashMap::new(),
                 actions: HashMap::new(),
