@@ -17,13 +17,7 @@ fn main() {
     let config_file = find_config_file(matches.value_of("config"));
     let mut configuration: Config = read_configuration_file(&config_file);
     match matches.subcommand_name() {
-        Some("run") => println!("Running..."), // if let Some(matches) = matches.subcommand_matches("run") {
-        //     let names = matches.values_of("name").unwrap();
-        //     // names.mambo
-        //     // println!();
-        //     run(names);
-        //     // for thing in names {}
-        // },
+        Some("run") => println!("Running..."),
         Some(thing) => println!("{}", thing),
         _ => println!("No subcommand."),
     }
