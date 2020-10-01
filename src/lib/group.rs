@@ -22,6 +22,13 @@ pub fn add(config: &mut Config, name: &String) {
     config.groups.insert(name.to_string(), group);
 }
 
+pub fn add_repo(config: &mut Config, name: &String, repo: &String) {
+    match config.groups.get_mut(&name.to_string()) {
+        Some(group) => group.members.push(repo.to_string()),
+        None => panic!("No known group named \"{}\".", name)
+    }
+}
+
 impl fmt::Display for Group {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Group {}:\n\tRepos:\n", self.name)?;

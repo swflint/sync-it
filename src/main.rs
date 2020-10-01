@@ -115,6 +115,10 @@ fn main() {
                     let name = matches.value_of("name").unwrap().to_string();
                     group::add(&mut configuration, &name);
                 },
+                Some("add") => if let Some(matches) = matches.subcommand_matches("add") {
+                    let name = matches.value_of("name").unwrap().to_string();
+                    let repo = matches.value_of("repo").unwrap().to_string();
+                    group::add_repo(&mut configuration, &name, &repo);
                 },
                 Some("show") => if let Some(matches) = matches.subcommand_matches("show") {
                     let name = matches.value_of("name").unwrap().to_string();
