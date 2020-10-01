@@ -80,7 +80,31 @@ fn main() {
                         _ => String::from("")
                     };
                     action::add(&mut configuration, &name, &command, &description);
-                }
+                },
+                Some("config") => if let Some(matches) = matches.subcommand_matches("config") {
+                    let name = matches.value_of("name").unwrap().to_string();
+                    match matches.value_of("disabled") {
+                        Some("YES") => action::update_disabled(&mut configuration, &name, true),
+                        Some("NO") => action::update_disabled(&mut configuration, &name, false),
+                        _ => {}
+                    }
+                    match matches.value_of("command") {
+                        Some(command) => action::update_command(&mut configuration, &name, &command.to_string()),
+                        _ => {}
+                    }
+                    match matches.value_of("description") {
+                        Some(description) => action::update_description(&mut configuration, &name, &description.to_string()),
+                        _ => {}
+                    }
+                },
+                Some("show") => if let Some(matches) = matches.subcommand_matches("show") {
+                    let name = matches.value_of("name").unwrap().to_string();
+                    let action = configuration.actions.get(&name);
+                    match action {
+                        Some(action) => println!("{}", action),
+                        None => eprintln!("No known action named \"{}\".", name)
+                    }
+                },
                 _ => panic!("Something has gone horribly wrong...")
             }
         },

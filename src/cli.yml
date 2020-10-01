@@ -235,15 +235,22 @@ subcommands:
                   value_name: NAME
                   help: The name of the action
                   required: true
-              - enabled:
-                  long: enabled
+              - disabled:
+                  long: disabled
                   value_name: YES/NO
                   help: Enable this action
+                  takes_value: true
               - command:
                   long: command
                   value_name: COMMAND
                   help: The command the action runs
+                  takes_value: true
                   required: true
+              - description:
+                  long: description
+                  value_name: DESCRIPTION
+                  help: Description of the action
+                  takes_value: true
         - show:
             about: Show information about an action
             args:
