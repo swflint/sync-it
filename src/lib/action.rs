@@ -20,6 +20,6 @@ impl fmt::Display for Action {
                self.description,
                self.command,
                self.disabled
-        );
+        )
     }
 }

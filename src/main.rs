@@ -4,15 +4,17 @@ use clap::App;
 
 use std::env;
 
-mod config;
-use config::{
-    find_config_file,
-    read_configuration_file,
-    write_configuration_file,
-    Config
-};
+mod lib;
 
-mod repository;
+use crate::lib::{
+    config::{
+        find_config_file,
+        read_configuration_file,
+        write_configuration_file,
+        Config
+    },
+    repository
+};
 
 fn main() {
     let yaml = load_yaml!("cli.yml");

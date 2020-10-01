@@ -9,16 +9,21 @@ use std::io::Write;
 
 use home::home_dir;
 
-use crate::repository::{
+
+use crate::lib::repository::{
     Repository
 };
 
-use crate::repotype::{
+use crate::lib::repotype::{
     RepoType
 };
 
-use crate::action::{
+use crate::lib::action::{
     Action
+};
+
+use crate::lib::group::{
+    Group
 };
 
 #[derive(Serialize, Deserialize)]
@@ -31,16 +36,6 @@ pub struct Config {
     actions: HashMap<String, Action>,
     #[serde(rename(serialize = "group", deserialize = "group"), default)]
     groups: HashMap<String, Group>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct Group {
-    #[serde(default)]
-    name: String,
-    #[serde(default)]
-    actions_after: Vec<String>,
-    #[serde(default)]
-    members: Vec<String>,
 }
 
 pub fn find_config_file(original: Option<&str>) -> PathBuf {

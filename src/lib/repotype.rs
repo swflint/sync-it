@@ -22,6 +22,6 @@ impl fmt::Display for RepoType {
                self.description,
                self.create,
                self.inward,
-               self.outward);
+               self.outward)
     }
 }

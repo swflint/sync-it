@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt;
 
-use crate::config::Config;
+use crate::lib::config::Config;
 
 #[derive(Serialize, Deserialize)]
 pub struct Repository {
