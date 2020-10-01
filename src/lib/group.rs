@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
+use crate::lib::config::Config;
+
 #[derive(Serialize, Deserialize)]
 pub struct Group {
     #[serde(default)]
@@ -9,6 +11,15 @@ pub struct Group {
     actions_after: Vec<String>,
     #[serde(default)]
     members: Vec<String>,
+}
+
+pub fn add(config: &mut Config, name: &String) {
+    let group = Group {
+        name: name.to_string(),
+        actions_after: Vec::new(),
+        members: Vec::new()
+    };
+    config.groups.insert(name.to_string(), group);
 }
 
 impl fmt::Display for Group {

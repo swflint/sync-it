@@ -35,7 +35,7 @@ pub struct Config {
     #[serde(rename(serialize = "action", deserialize = "action"), default)]
     pub actions: HashMap<String, Action>,
     #[serde(rename(serialize = "group", deserialize = "group"), default)]
-    groups: HashMap<String, Group>,
+    pub groups: HashMap<String, Group>,
 }
 
 pub fn find_config_file(original: Option<&str>) -> PathBuf {

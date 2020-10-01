@@ -14,7 +14,8 @@ use crate::lib::{
         Config
     },
     repository,
-    action
+    action,
+    group
 };
 
 fn main() {
@@ -103,6 +104,24 @@ fn main() {
                     match action {
                         Some(action) => println!("{}", action),
                         None => eprintln!("No known action named \"{}\".", name)
+                    }
+                },
+                _ => panic!("Something has gone horribly wrong...")
+            }
+        },
+        Some("group") => if let Some(matches) = matches.subcommand_matches("group") {
+            match matches.subcommand_name() {
+                Some("create") => if let Some(matches) = matches.subcommand_matches("create") {
+                    let name = matches.value_of("name").unwrap().to_string();
+                    group::add(&mut configuration, &name);
+                },
+                },
+                Some("show") => if let Some(matches) = matches.subcommand_matches("show") {
+                    let name = matches.value_of("name").unwrap().to_string();
+                    let group = configuration.groups.get(&name);
+                    match group {
+                        Some(group) => println!("{}", group),
+                        None => eprintln!("No known group named \"{}\".", name)
                     }
                 },
                 _ => panic!("Something has gone horribly wrong...")
