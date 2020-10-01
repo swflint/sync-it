@@ -122,6 +122,19 @@ subcommands:
                   value_name: REPO_NAME
                   help: The name of the repo
                   required: true
+        - act:
+            about: Add action to a group
+            args:
+               - group:
+                   index: 1
+                   value_name: GROUP_NAME
+                   help: The name of the group
+                   required: true
+                - action:
+                    index: 2
+                    value_name: ACTION_NAME
+                    help: The name of the action
+                    required: true
         - remove:
             about: Remove a repo from a group
             args:
