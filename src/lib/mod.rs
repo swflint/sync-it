@@ -1,4 +1,4 @@
-mod action;
+pub mod action;
 pub mod config;
 mod group;
 pub mod repository;

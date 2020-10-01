@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
+use crate::lib::config::Config;
+
 #[derive(Serialize, Deserialize)]
 pub struct Action {
     #[serde(default)]
@@ -11,6 +13,16 @@ pub struct Action {
     command: String,
     #[serde(default)]
     disabled: bool,
+}
+
+pub fn add(config: &mut Config, name: &String, description: &String, command: &String) {
+    let action = Action {
+        name : name.to_string(),
+        description: description.to_string(),
+        command: command.to_string(),
+        disabled: false
+    };
+    config.actions.insert(name.to_string(), action);
 }
 
 impl fmt::Display for Action {

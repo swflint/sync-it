@@ -33,7 +33,7 @@ pub struct Config {
     #[serde(rename(serialize = "repository", deserialize = "repository"), default)]
     pub repositories: HashMap<String, Repository>,
     #[serde(rename(serialize = "action", deserialize = "action"), default)]
-    actions: HashMap<String, Action>,
+    pub actions: HashMap<String, Action>,
     #[serde(rename(serialize = "group", deserialize = "group"), default)]
     groups: HashMap<String, Group>,
 }

@@ -222,6 +222,11 @@ subcommands:
                   value_name: COMMAND
                   help: The command the action runs
                   required: true
+              - description:
+                  long: description
+                  value_name: DESCRIPTION
+                  help: Description of the action
+                  takes_value: true
         - config:
             about: Configure an action
             args:

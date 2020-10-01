@@ -13,7 +13,8 @@ use crate::lib::{
         write_configuration_file,
         Config
     },
-    repository
+    repository,
+    action
 };
 
 fn main() {
@@ -68,7 +69,21 @@ fn main() {
                 }
                 _ => panic!("Something has gone horribly wrong...")
             }
-        }
+        },
+        Some("action") => if let Some(matches) = matches.subcommand_matches("action") {
+            match matches.subcommand_name() {
+                Some("create") => if let Some(matches) = matches.subcommand_matches("create") {
+                    let name = matches.value_of("name").unwrap().to_string();
+                    let command = matches.value_of("command").unwrap().to_string();
+                    let description = match matches.value_of("description") {
+                        Some(string) => string.to_string(),
+                        _ => String::from("")
+                    };
+                    action::add(&mut configuration, &name, &command, &description);
+                }
+                _ => panic!("Something has gone horribly wrong...")
+            }
+        },
         Some(thing) => println!("{}", thing),
         _ => println!("No subcommand."),
     }
