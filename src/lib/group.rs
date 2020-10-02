@@ -29,6 +29,10 @@ pub fn add_repo(config: &mut Config, name: &String, repo: &String) {
     }
 }
 
+// TODO: add action adding
+// TODO: add repo removal
+// TODO: add group deletion
+
 impl fmt::Display for Group {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Group {}:\n\tRepos:\n", self.name)?;
