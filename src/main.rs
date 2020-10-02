@@ -120,6 +120,11 @@ fn main() {
                     let repo = matches.value_of("repo").unwrap().to_string();
                     group::add_repo(&mut configuration, &name, &repo);
                 },
+                Some("act") => if let Some(matches) = matches.subcommand_matches("act") {
+                    let name = matches.value_of("name").unwrap().to_string();
+                    let action = matches.value_of("action").unwrap().to_string();
+                    group::add_action(&mut configuration, &name, &action);
+                },
                 Some("show") => if let Some(matches) = matches.subcommand_matches("show") {
                     let name = matches.value_of("name").unwrap().to_string();
                     let group = configuration.groups.get(&name);

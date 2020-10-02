@@ -29,7 +29,13 @@ pub fn add_repo(config: &mut Config, name: &String, repo: &String) {
     }
 }
 
-// TODO: add action adding
+pub fn add_action(config: &mut Config, name: &String, action: &String) {
+    match config.groups.get_mut(&name.to_string()) {
+        Some(group) => group.actions_after.push(action.to_string()),
+        None => panic!("No known group named \"{}\".", name)
+    }
+}
+
 // TODO: add repo removal
 // TODO: add group deletion
 
