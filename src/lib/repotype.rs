@@ -15,6 +15,9 @@ pub struct RepoType {
     outward: String,
 }
 
+// TODO add creation
+// TODO add configuration
+
 impl fmt::Display for RepoType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Repository type {}:\n\t\"{}\"\n\tCreation Command: {}\n\tInward Sync: {}\n\tOutward Sync: {}",
