@@ -36,7 +36,13 @@ pub fn add_action(config: &mut Config, name: &String, action: &String) {
     }
 }
 
-// TODO: add repo removal
+pub fn remove_repo(config: &mut Config, name: &String, repo: &String) {
+    match config.groups.get_mut(&name.to_string()) {
+        Some(group) => group.members.retain(|r| r != repo),
+        None => panic!("No known group named \"{}\".", name)
+    }
+}
+
 // TODO: add group deletion
 
 impl fmt::Display for Group {

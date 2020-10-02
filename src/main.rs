@@ -125,6 +125,11 @@ fn main() {
                     let action = matches.value_of("action").unwrap().to_string();
                     group::add_action(&mut configuration, &name, &action);
                 },
+                Some("remove") => if let Some(matches) = matches.subcommand_matches("remove") {
+                    let name = matches.value_of("name").unwrap().to_string();
+                    let repo = matches.value_of("repo").unwrap().to_string();
+                    group::remove_repo(&mut configuration, &name, &repo);
+                },
                 Some("show") => if let Some(matches) = matches.subcommand_matches("show") {
                     let name = matches.value_of("name").unwrap().to_string();
                     let group = configuration.groups.get(&name);
