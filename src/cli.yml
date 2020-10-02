@@ -148,6 +148,14 @@ subcommands:
                   value_name: REPO_NAME
                   help: The name of the repo
                   required: true
+        - drop:
+            about: Remove a group
+            args:
+              - group:
+                  index: 1
+                  value_name: GROUP_NAME
+                  help: The name of the group
+                  required: true
         - show:
             about: Show information about a group
             args:

@@ -112,26 +112,30 @@ fn main() {
         Some("group") => if let Some(matches) = matches.subcommand_matches("group") {
             match matches.subcommand_name() {
                 Some("create") => if let Some(matches) = matches.subcommand_matches("create") {
-                    let name = matches.value_of("name").unwrap().to_string();
+                    let name = matches.value_of("group").unwrap().to_string();
                     group::add(&mut configuration, &name);
                 },
                 Some("add") => if let Some(matches) = matches.subcommand_matches("add") {
-                    let name = matches.value_of("name").unwrap().to_string();
+                    let name = matches.value_of("group").unwrap().to_string();
                     let repo = matches.value_of("repo").unwrap().to_string();
                     group::add_repo(&mut configuration, &name, &repo);
                 },
                 Some("act") => if let Some(matches) = matches.subcommand_matches("act") {
-                    let name = matches.value_of("name").unwrap().to_string();
+                    let name = matches.value_of("group").unwrap().to_string();
                     let action = matches.value_of("action").unwrap().to_string();
                     group::add_action(&mut configuration, &name, &action);
                 },
                 Some("remove") => if let Some(matches) = matches.subcommand_matches("remove") {
-                    let name = matches.value_of("name").unwrap().to_string();
+                    let name = matches.value_of("group").unwrap().to_string();
                     let repo = matches.value_of("repo").unwrap().to_string();
                     group::remove_repo(&mut configuration, &name, &repo);
                 },
+                Some("drop") => if let Some(matches) = matches.subcommand_matches("drop") {
+                    let name = matches.value_of("group").unwrap().to_string();
+                    group::remove_group(&mut configuration, &name);
+                }
                 Some("show") => if let Some(matches) = matches.subcommand_matches("show") {
-                    let name = matches.value_of("name").unwrap().to_string();
+                    let name = matches.value_of("group").unwrap().to_string();
                     let group = configuration.groups.get(&name);
                     match group {
                         Some(group) => println!("{}", group),

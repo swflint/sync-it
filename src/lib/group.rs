@@ -43,7 +43,9 @@ pub fn remove_repo(config: &mut Config, name: &String, repo: &String) {
     }
 }
 
-// TODO: add group deletion
+pub fn remove_group(config: &mut Config, name: &String) {
+    config.groups.remove(&name.to_string());
+}
 
 impl fmt::Display for Group {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
