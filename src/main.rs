@@ -181,6 +181,41 @@ fn main() {
                     };
                     repotype::add(&mut configuration, &name, &description, &create, &inward, &outward, &status, &pre_inward, &post_inward, &post_outward);
                 },
+                Some("config") => if let Some(matches) = matches.subcommand_matches("config") {
+                    let name = matches.value_of("name").unwrap().to_string();
+                    match matches.value_of("description") {
+                        Some(description) => repotype::update_description(&mut configuration, &name, &description.to_string()),
+                        _ => {}
+                    }
+                    match matches.value_of("create") {
+                        Some(create) => repotype::update_create(&mut configuration, &name, &create.to_string()),
+                        _ => {}
+                    }
+                    match matches.value_of("inward") {
+                        Some(inward) => repotype::update_inward(&mut configuration, &name, &inward.to_string()),
+                        _ => {}
+                    }
+                    match matches.value_of("outward") {
+                        Some(outward) => repotype::update_outward(&mut configuration, &name, &outward.to_string()),
+                        _ => {}
+                    }
+                    match matches.value_of("status") {
+                        Some(status) => repotype::update_status(&mut configuration, &name, &status.to_string()),
+                        _ => {}
+                    }
+                    match matches.value_of("pre_inward") {
+                        Some(pre_inward) => repotype::update_pre_inward(&mut configuration, &name, &pre_inward.to_string()),
+                        _ => {}
+                    }
+                    match matches.value_of("post_inward") {
+                        Some(post_inward) => repotype::update_post_inward(&mut configuration, &name, &post_inward.to_string()),
+                        _ => {}
+                    }
+                    match matches.value_of("post_outward") {
+                        Some(post_outward) => repotype::update_post_outward(&mut configuration, &name, &post_outward.to_string()),
+                        _ => {}
+                    }
+                }
                 Some("show") => if let Some(matches) = matches.subcommand_matches("show") {
                     let name = matches.value_of("name").unwrap().to_string();
                     let repo_type = configuration.repo_types.get(&name);

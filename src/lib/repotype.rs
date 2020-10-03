@@ -40,7 +40,61 @@ pub fn add(config: &mut Config, name: &String, description: &String, create: &St
     config.repo_types.insert(name.to_string(), repo_type);
 }
 
-// TODO add configuration
+pub fn update_description(config: &mut Config, name: &String, description: &String) {
+    match config.repo_types.get_mut(&name.to_string()) {
+        Some(repo_type) => repo_type.description = description.to_string(),
+        None => panic!("No known repository type named \"{}\".", name)
+    }
+}
+
+pub fn update_create(config: &mut Config, name: &String, create: &String) {
+    match config.repo_types.get_mut(&name.to_string()) {
+        Some(repo_type) => repo_type.create = create.to_string(),
+        None => panic!("No known repository type named \"{}\".", name)
+    }
+}
+
+pub fn update_inward(config: &mut Config, name: &String, inward: &String) {
+    match config.repo_types.get_mut(&name.to_string()) {
+        Some(repo_type) => repo_type.inward = inward.to_string(),
+        None => panic!("No known repository type named \"{}\".", name)
+    }
+}
+
+pub fn update_outward(config: &mut Config, name: &String, outward: &String) {
+    match config.repo_types.get_mut(&name.to_string()) {
+        Some(repo_type) => repo_type.outward = outward.to_string(),
+        None => panic!("No known repository type named \"{}\".", name)
+    }
+}
+
+pub fn update_status(config: &mut Config, name: &String, status: &String) {
+    match config.repo_types.get_mut(&name.to_string()) {
+        Some(repo_type) => repo_type.status = status.to_string(),
+        None => panic!("No known repository type named \"{}\".", name)
+    }
+}
+
+pub fn update_pre_inward(config: &mut Config, name: &String, pre_inward: &String) {
+    match config.repo_types.get_mut(&name.to_string()) {
+        Some(repo_type) => repo_type.pre_inward = pre_inward.to_string(),
+        None => panic!("No known repository type named \"{}\".", name)
+    }
+}
+
+pub fn update_post_inward(config: &mut Config, name: &String, post_inward: &String) {
+    match config.repo_types.get_mut(&name.to_string()) {
+        Some(repo_type) => repo_type.post_inward = post_inward.to_string(),
+        None => panic!("No known repository type named \"{}\".", name)
+    }
+}
+
+pub fn update_post_outward(config: &mut Config, name: &String, post_outward: &String) {
+    match config.repo_types.get_mut(&name.to_string()) {
+        Some(repo_type) => repo_type.post_outward = post_outward.to_string(),
+        None => panic!("No known repository type named \"{}\".", name)
+    }
+}
 
 impl fmt::Display for RepoType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
