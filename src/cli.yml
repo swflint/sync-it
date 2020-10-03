@@ -193,6 +193,22 @@ subcommands:
                   long: outward
                   takes_value: true
                   help: Command to perform outward sync of a repository of type NAME
+              - status:
+                  long: status
+                  takes_value: true
+                  help: Command to display status of repository
+              - pre_inward:
+                  long: pre-inward
+                  takes_value: true
+                  help: Command describing potential pre-inward action
+              - post_inward:
+                  long: post-inward
+                  takes_value: true
+                  help: Command describing post-inward action
+              - post_outward:
+                  long: post-outward
+                  takes_value: true
+                  help: Command describing post-outward action
         - config:
             about: Configure a repository type
             args:
@@ -217,6 +233,22 @@ subcommands:
                   long: outward
                   takes_value: true
                   help: Command to perform outward sync of a repository of type NAME
+              - status:
+                  long: status
+                  takes_value: true
+                  help: Command to display status of repository
+              - pre_inward:
+                  long: pre-inward
+                  takes_value: true
+                  help: Command describing potential pre-inward action
+              - post_inward:
+                  long: post-inward
+                  takes_value: true
+                  help: Command describing post-inward action
+              - post_outward:
+                  long: post-outward
+                  takes_value: true
+                  help: Command describing post-outward action
         - show:
             about: Show information about a type
             args:

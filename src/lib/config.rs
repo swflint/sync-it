@@ -29,7 +29,7 @@ use crate::lib::group::{
 #[derive(Serialize, Deserialize)]
 pub struct Config {
     #[serde(rename(serialize = "repo_type", deserialize = "repo_type"), default)]
-    repo_types: HashMap<String, RepoType>,
+    pub repo_types: HashMap<String, RepoType>,
     #[serde(rename(serialize = "repository", deserialize = "repository"), default)]
     pub repositories: HashMap<String, Repository>,
     #[serde(rename(serialize = "action", deserialize = "action"), default)]

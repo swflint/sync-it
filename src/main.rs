@@ -15,7 +15,8 @@ use crate::lib::{
     },
     repository,
     action,
-    group
+    group,
+    repotype
 };
 
 fn main() {
@@ -140,6 +141,52 @@ fn main() {
                     match group {
                         Some(group) => println!("{}", group),
                         None => eprintln!("No known group named \"{}\".", name)
+                    }
+                },
+                _ => panic!("Something has gone horribly wrong...")
+            }
+        },
+        Some("type") => if let Some(matches) = matches.subcommand_matches("type") {
+            match matches.subcommand_name() {
+                Some("create") => if let Some(matches) = matches.subcommand_matches("create") {
+                    let name = matches.value_of("name").unwrap().to_string();
+                    let description = matches.value_of("description").unwrap().to_string();
+                    let create = match matches.value_of("create") {
+                        Some(thing) => thing.to_string(),
+                        None => "".to_string()
+                    };
+                    let inward = match matches.value_of("inward") {
+                        Some(thing) => thing.to_string(),
+                        None => "".to_string()
+                    };
+                    let outward = match matches.value_of("outward") {
+                        Some(thing) => thing.to_string(),
+                        None => "".to_string()
+                    };
+                    let status = match matches.value_of("status") {
+                        Some(thing) => thing.to_string(),
+                        None => "".to_string()
+                    };
+                    let pre_inward = match matches.value_of("pre_inward") {
+                        Some(thing) => thing.to_string(),
+                        None => "".to_string()
+                    };
+                    let post_inward = match matches.value_of("post_inward") {
+                        Some(thing) => thing.to_string(),
+                        None => "".to_string()
+                    };
+                    let post_outward = match matches.value_of("post_outward") {
+                        Some(thing) => thing.to_string(),
+                        None => "".to_string()
+                    };
+                    repotype::add(&mut configuration, &name, &description, &create, &inward, &outward, &status, &pre_inward, &post_inward, &post_outward);
+                },
+                Some("show") => if let Some(matches) = matches.subcommand_matches("show") {
+                    let name = matches.value_of("name").unwrap().to_string();
+                    let repo_type = configuration.repo_types.get(&name);
+                    match repo_type {
+                        Some(repo_type) => println!("{}", repo_type),
+                        None => eprintln!("No known repo type named \"{}\".", name)
                     }
                 },
                 _ => panic!("Something has gone horribly wrong...")
