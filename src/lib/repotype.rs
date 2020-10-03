@@ -98,11 +98,15 @@ pub fn update_post_outward(config: &mut Config, name: &String, post_outward: &St
 
 impl fmt::Display for RepoType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Repository type {}:\n\t\"{}\"\n\tCreation Command: {}\n\tInward Sync: {}\n\tOutward Sync: {}",
+        write!(f, "Repository type {}:\n\t\"{}\"\n\tCreation Command: {}\n\tInward Sync: {}\n\tOutward Sync: {}\n\tStatus: {}\n\tPre-inward: {}\n\tPost-inward: {}\n\tPost-outward: {}",
                self.name,
                self.description,
                self.create,
                self.inward,
-               self.outward)
+               self.outward,
+               self.status,
+               self.pre_inward,
+               self.post_inward,
+               self.post_outward)
     }
 }
