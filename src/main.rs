@@ -16,7 +16,8 @@ use crate::lib::{
     repository,
     action,
     group,
-    repotype
+    repotype,
+    run
 };
 
 fn main() {
@@ -27,7 +28,7 @@ fn main() {
     let mut configuration: Config = read_configuration_file(&config_file);
 
     match matches.subcommand_name() {
-        Some("run") => println!("Running..."),
+        Some("run") => run::run(&configuration, matches.subcommand_matches("run").unwrap().values_of("name").unwrap()),
         Some("repository") => if let Some(matches) = matches.subcommand_matches("repository") {
             match matches.subcommand_name() {
                 Some("register") => if let Some(matches) = matches.subcommand_matches("register") {

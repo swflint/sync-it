@@ -1,11 +1,14 @@
 use clap::Values;
-use config::{
-    Config,
-    Repository
-}
+use crate::lib::{
+    config::Config,
+    repository::Repository,
+    group::Group,
+    repotype::RepoType,
+    action::Action
+};
 
-pub fn run(names: Values<'_>) {
+pub fn run(config: &Config, names: Values<'_>) {
     for name in names {
-        println!("Name: {}", name)
+        println!("Running {}...", name)
     }
 }
