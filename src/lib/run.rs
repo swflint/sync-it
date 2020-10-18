@@ -82,11 +82,16 @@ pub fn run_repository_sync(config: &Config, name: String) {
                     let repo_type = config.repo_types.get(&repository.repo_type);
                     match repo_type {
                         Some(repo_type) => {
-                            run_command_in_directory(location.to_string(), Template::new(&repo_type.pre_inward).render(&options));
-                            run_command_in_directory(location.to_string(), Template::new(&repo_type.inward).render(&options));
-                            run_command_in_directory(location.to_string(), Template::new(&repo_type.post_inward).render(&options));
-                            run_command_in_directory(location.to_string(), Template::new(&repo_type.outward).render(&options));
-                            run_command_in_directory(location.to_string(), Template::new(&repo_type.post_outward).render(&options));
+                            run_command_in_directory(location.to_string(),
+                                                     Template::new(&repo_type.pre_inward).render(&options));
+                            run_command_in_directory(location.to_string(),
+                                                     Template::new(&repo_type.inward).render(&options));
+                            run_command_in_directory(location.to_string(),
+                                                     Template::new(&repo_type.post_inward).render(&options));
+                            run_command_in_directory(location.to_string(),
+                                                     Template::new(&repo_type.outward).render(&options));
+                            run_command_in_directory(location.to_string(),
+                                                     Template::new(&repo_type.post_outward).render(&options));
                         },
                         None => panic!("No known repository type named \"{}\".", &repository.repo_type)
                     }
