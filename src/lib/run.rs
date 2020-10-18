@@ -91,6 +91,7 @@ pub fn run_repository_sync(config: &Config, name: String) {
                     for (key, value) in &repository.options {
                         options.insert(key, value);
                     }
+                    options.insert("location", location);
                     let repo_type = config.repo_types.get(&repository.repo_type);
                     match repo_type {
                         Some(repo_type) => {
