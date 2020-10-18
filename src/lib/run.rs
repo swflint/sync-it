@@ -1,11 +1,5 @@
 use clap::Values;
-use crate::lib::{
-    config::Config,
-    repository::Repository,
-    group::Group,
-    repotype::RepoType,
-    action::Action
-};
+use crate::lib::config::Config;
 
 use string_template::Template;
 
