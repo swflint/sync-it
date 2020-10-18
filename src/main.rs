@@ -151,7 +151,10 @@ fn main() {
             match matches.subcommand_name() {
                 Some("create") => if let Some(matches) = matches.subcommand_matches("create") {
                     let name = matches.value_of("name").unwrap().to_string();
-                    let description = matches.value_of("description").unwrap().to_string();
+                    let description = match matches.value_of("description") {
+                        Some(thing) => thing.to_string(),
+                        None => "".to_string()
+                    };
                     let create = match matches.value_of("create") {
                         Some(thing) => thing.to_string(),
                         None => "".to_string()
