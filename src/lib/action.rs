@@ -10,9 +10,9 @@ pub struct Action {
     #[serde(default)]
     description: String,
     #[serde(default)]
-    command: String,
+    pub command: String,
     #[serde(default)]
-    disabled: bool,
+    pub disabled: bool,
 }
 
 pub fn add(config: &mut Config, name: &String, description: &String, command: &String) {
