@@ -69,6 +69,11 @@ fn main() {
                         Some(repository) => println!("{}", repository),
                         None => eprintln!("No known repository named \"{}\".", name)
                     }
+                },
+                Some("list") => {
+                    for key in configuration.repositories.keys() {
+                        println!(" - {}", key);
+                    }
                 }
                 _ => panic!("Something has gone horribly wrong...")
             }
@@ -108,6 +113,11 @@ fn main() {
                         None => eprintln!("No known action named \"{}\".", name)
                     }
                 },
+                Some("list") => {
+                    for key in configuration.actions.keys() {
+                        println!(" - {}", key);
+                    }
+                }
                 _ => panic!("Something has gone horribly wrong...")
             }
         },
@@ -142,6 +152,11 @@ fn main() {
                     match group {
                         Some(group) => println!("{}", group),
                         None => eprintln!("No known group named \"{}\".", name)
+                    }
+                },
+                Some("list") => {
+                    for key in configuration.groups.keys() {
+                        println!(" - {}", key);
                     }
                 },
                 _ => panic!("Something has gone horribly wrong...")
@@ -226,6 +241,11 @@ fn main() {
                     match repo_type {
                         Some(repo_type) => println!("{}", repo_type),
                         None => eprintln!("No known repo type named \"{}\".", name)
+                    }
+                },
+                Some("list") => {
+                    for key in configuration.repo_types.keys() {
+                        println!(" - {}", key);
                     }
                 },
                 _ => panic!("Something has gone horribly wrong...")

@@ -36,6 +36,8 @@ subcommands:
         - repo
         - r
       subcommands:
+        - list:
+            about: List repositories
         - register:
             about: Register the current directory as a repository
             args:
@@ -164,6 +166,8 @@ subcommands:
                   value_name: NAME
                   help: The name of the group
                   required: true
+        - list:
+            about: List known groups
   - type:
       about: Create and manage repository types
       settings:
@@ -257,6 +261,8 @@ subcommands:
                   value_name: NAME
                   help: The name of the repository type
                   required: true
+        - list:
+            about: List known repository types
   - action:
       about: Create and manage actions
       settings:
@@ -312,3 +318,5 @@ subcommands:
                   value_name: NAME
                   help: The name of the repository type
                   required: true
+        - list:
+            about: List known actions
