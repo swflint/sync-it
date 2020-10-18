@@ -125,12 +125,12 @@ subcommands:
         - act:
             about: Add action to a group
             args:
-               - group:
+              - group:
                    index: 1
                    value_name: GROUP_NAME
                    help: The name of the group
                    required: true
-                - action:
+              - action:
                     index: 2
                     value_name: ACTION_NAME
                     help: The name of the action
