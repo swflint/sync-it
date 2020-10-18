@@ -28,6 +28,8 @@ use crate::lib::group::{
 
 #[derive(Serialize, Deserialize)]
 pub struct Config {
+    #[serde(skip)]
+    pub is_changed: bool,
     #[serde(rename(serialize = "repo_type", deserialize = "repo_type"), default)]
     pub repo_types: BTreeMap<String, RepoType>,
     #[serde(rename(serialize = "repository", deserialize = "repository"), default)]
@@ -58,6 +60,7 @@ pub fn read_configuration_file(filename: &PathBuf) -> Config {
     match text {
         Err(_) => {
             let config = Config {
+                is_changed: true,
                 repo_types: BTreeMap::new(),
                 repositories: BTreeMap::new(),
                 actions: BTreeMap::new(),
@@ -65,13 +68,21 @@ pub fn read_configuration_file(filename: &PathBuf) -> Config {
             };
             return config;
         },
-        Ok(s) => return toml::from_str(&s).unwrap()
+        Ok(s) => {
+            let mut config: Config = toml::from_str(&s).unwrap();
+            config.is_changed = false;
+            return config;
+        }
     }
 }
 
 pub fn write_configuration_file(filename: PathBuf, configuration: Config) -> std::io::Result<()> {
-    let toml = toml::to_string_pretty(&configuration).unwrap();
-    let mut file = File::create(filename)?;
-    file.write_all(toml.as_bytes())?;
-    Ok(())
+    if configuration.is_changed {
+        let toml = toml::to_string_pretty(&configuration).unwrap();
+        let mut file = File::create(filename)?;
+        file.write_all(toml.as_bytes())?;
+        Ok(())
+    } else {
+        Ok(())
+    }
 }

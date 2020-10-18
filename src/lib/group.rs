@@ -20,31 +20,42 @@ pub fn add(config: &mut Config, name: &String) {
         members: Vec::new()
     };
     config.groups.insert(name.to_string(), group);
+    config.is_changed = true;
 }
 
 pub fn add_repo(config: &mut Config, name: &String, repo: &String) {
     match config.groups.get_mut(&name.to_string()) {
-        Some(group) => group.members.push(repo.to_string()),
+        Some(group) => {
+            group.members.push(repo.to_string());
+            config.is_changed = true;
+        },
         None => panic!("No known group named \"{}\".", name)
     }
 }
 
 pub fn add_action(config: &mut Config, name: &String, action: &String) {
     match config.groups.get_mut(&name.to_string()) {
-        Some(group) => group.actions_after.push(action.to_string()),
+        Some(group) => {
+            group.actions_after.push(action.to_string());
+            config.is_changed = true;
+        },
         None => panic!("No known group named \"{}\".", name)
     }
 }
 
 pub fn remove_repo(config: &mut Config, name: &String, repo: &String) {
     match config.groups.get_mut(&name.to_string()) {
-        Some(group) => group.members.retain(|r| r != repo),
+        Some(group) => {
+            group.members.retain(|r| r != repo);
+            config.is_changed = true;
+        }
         None => panic!("No known group named \"{}\".", name)
     }
 }
 
 pub fn remove_group(config: &mut Config, name: &String) {
     config.groups.remove(&name.to_string());
+    config.is_changed = true;
 }
 
 impl fmt::Display for Group {

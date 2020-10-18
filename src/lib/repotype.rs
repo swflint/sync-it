@@ -38,60 +38,85 @@ pub fn add(config: &mut Config, name: &String, description: &String, create: &St
         post_outward: post_outward.to_string()
     };
     config.repo_types.insert(name.to_string(), repo_type);
+    config.is_changed = true;
 }
 
 pub fn update_description(config: &mut Config, name: &String, description: &String) {
     match config.repo_types.get_mut(&name.to_string()) {
-        Some(repo_type) => repo_type.description = description.to_string(),
+        Some(repo_type) => {
+            repo_type.description = description.to_string();
+            config.is_changed = true;
+        },
         None => panic!("No known repository type named \"{}\".", name)
     }
 }
 
 pub fn update_create(config: &mut Config, name: &String, create: &String) {
     match config.repo_types.get_mut(&name.to_string()) {
-        Some(repo_type) => repo_type.create = create.to_string(),
+        Some(repo_type) => {
+            repo_type.create = create.to_string();
+            config.is_changed = true;
+        },
         None => panic!("No known repository type named \"{}\".", name)
     }
 }
 
 pub fn update_inward(config: &mut Config, name: &String, inward: &String) {
     match config.repo_types.get_mut(&name.to_string()) {
-        Some(repo_type) => repo_type.inward = inward.to_string(),
+        Some(repo_type) => {
+            repo_type.inward = inward.to_string();
+            config.is_changed = true;
+        },
         None => panic!("No known repository type named \"{}\".", name)
     }
 }
 
 pub fn update_outward(config: &mut Config, name: &String, outward: &String) {
     match config.repo_types.get_mut(&name.to_string()) {
-        Some(repo_type) => repo_type.outward = outward.to_string(),
+        Some(repo_type) => {
+            repo_type.outward = outward.to_string();
+            config.is_changed = true;
+        },
         None => panic!("No known repository type named \"{}\".", name)
     }
 }
 
 pub fn update_status(config: &mut Config, name: &String, status: &String) {
     match config.repo_types.get_mut(&name.to_string()) {
-        Some(repo_type) => repo_type.status = status.to_string(),
+        Some(repo_type) => {
+            repo_type.status = status.to_string();
+            config.is_changed = true;
+        },
         None => panic!("No known repository type named \"{}\".", name)
     }
 }
 
 pub fn update_pre_inward(config: &mut Config, name: &String, pre_inward: &String) {
     match config.repo_types.get_mut(&name.to_string()) {
-        Some(repo_type) => repo_type.pre_inward = pre_inward.to_string(),
+        Some(repo_type) => {
+            repo_type.pre_inward = pre_inward.to_string();
+            config.is_changed = true;
+        },
         None => panic!("No known repository type named \"{}\".", name)
     }
 }
 
 pub fn update_post_inward(config: &mut Config, name: &String, post_inward: &String) {
     match config.repo_types.get_mut(&name.to_string()) {
-        Some(repo_type) => repo_type.post_inward = post_inward.to_string(),
+        Some(repo_type) => {
+            repo_type.post_inward = post_inward.to_string();
+            config.is_changed = true;
+        },
         None => panic!("No known repository type named \"{}\".", name)
     }
 }
 
 pub fn update_post_outward(config: &mut Config, name: &String, post_outward: &String) {
     match config.repo_types.get_mut(&name.to_string()) {
-        Some(repo_type) => repo_type.post_outward = post_outward.to_string(),
+        Some(repo_type) => {
+            repo_type.post_outward = post_outward.to_string();
+            config.is_changed = true;
+        },
         None => panic!("No known repository type named \"{}\".", name)
     }
 }

@@ -23,12 +23,16 @@ pub fn add(config: &mut Config, name: &String, description: &String, command: &S
         disabled: false
     };
     config.actions.insert(name.to_string(), action);
+    config.is_changed = true;
 }
 
 pub fn update_disabled(config: &mut Config, name: &String, value: bool) {
     let action = config.actions.get_mut(&name.to_string());
     match action {
-        Some(action) => action.disabled = value,
+        Some(action) => {
+            action.disabled = value;
+            config.is_changed = true;
+        },
         None => panic!("No known action named \"{}\".", name)
     }
 }
@@ -36,7 +40,10 @@ pub fn update_disabled(config: &mut Config, name: &String, value: bool) {
 pub fn update_description(config: &mut Config, name: &String, description: &String) {
     let action = config.actions.get_mut(&name.to_string());
     match action {
-        Some(action) => action.description = description.to_string(),
+        Some(action) => {
+            action.description = description.to_string();
+            config.is_changed = true;
+        },
         None => panic!("No known action named \"{}\".", name)
     }
 }
@@ -44,7 +51,10 @@ pub fn update_description(config: &mut Config, name: &String, description: &Stri
 pub fn update_command(config: &mut Config, name: &String, command: &String) {
     let action = config.actions.get_mut(&name.to_string());
     match action {
-        Some(action) => action.command = command.to_string(),
+        Some(action) => {
+            action.command = command.to_string();
+            config.is_changed = true;
+        },
         None => panic!("No known action named \"{}\".", name)
     }
 }

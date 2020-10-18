@@ -35,12 +35,16 @@ pub fn register(config: &mut Config, name: &String, location: String, repo_type:
         options: options_map
     };
     config.repositories.insert(name.to_string(), repo);
+    config.is_changed = true;
 }
 
 pub fn update_disabled(config: &mut Config, name: &String, value: bool) {
     let repo = config.repositories.get_mut(&name.to_string());
     match repo {
-        Some(repo) => repo.disabled = value,
+        Some(repo) => {
+            repo.disabled = value;
+            config.is_changed = true;
+        },
         None => panic!("No known repository named \"{}\".", name)
     }
 }
@@ -48,7 +52,10 @@ pub fn update_disabled(config: &mut Config, name: &String, value: bool) {
 pub fn update_autocreate(config: &mut Config, name: &String, value: bool) {
     let repo = config.repositories.get_mut(&name.to_string());
     match repo {
-        Some(repo) => repo.auto_create = value,
+        Some(repo) => {
+            repo.auto_create = value;
+            config.is_changed = true;
+        }
         None => panic!("No known repository named \"{}\".", name)
     }
 }
@@ -59,6 +66,7 @@ pub fn update_options(config: &mut Config, name: &String, options_strings: Vec<S
         Some(repo) => for option in options_strings {
             let option_pair: Vec<&str> = option.split("=").collect();
             repo.options.insert(option_pair[0].to_string(), option_pair[1].to_string());
+            config.is_changed = true;
         }
         None => panic!("No known repository named \"{}\".", name)
     }
