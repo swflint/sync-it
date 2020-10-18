@@ -9,7 +9,13 @@ use std::collections::HashMap;
 
 pub fn run(config: &Config, names: Values<'_>) {
     for name in names {
-        println!("Running {}...", name)
+        if config.repositories.contains_key(name) {
+            run_repository_sync(&config, name.to_string());
+        } else if config.groups.contains_key(name) {
+            run_group(&config, name.to_string());
+        } else {
+            println!("\"{}\" is neither a group nor a repository.", name);
+        }
     }
 }
 
