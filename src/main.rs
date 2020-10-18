@@ -82,7 +82,7 @@ fn main() {
                         Some(string) => string.to_string(),
                         _ => String::from("")
                     };
-                    action::add(&mut configuration, &name, &command, &description);
+                    action::add(&mut configuration, &name, &description, &command);
                 },
                 Some("config") => if let Some(matches) = matches.subcommand_matches("config") {
                     let name = matches.value_of("name").unwrap().to_string();
