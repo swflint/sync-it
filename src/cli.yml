@@ -46,12 +46,12 @@ subcommands:
                   help: The type of repository
                   required: true
               - name:
-                  index: 2
+                  long: name
+                  short: n
                   value_name: REPO_NAME
                   help: The name of the repository
-                  required: true
               - options:
-                  index: 3
+                  index: 2
                   value_name: OPTION
                   help: Type-specific options, in form "name=value"
                   multiple: true
