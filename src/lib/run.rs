@@ -20,44 +20,48 @@ pub fn run(config: &Config, names: Values<'_>) {
 }
 
 fn run_command(command: String) {
-    match Command::new("sh")
-        .arg("-c")
-        .arg(command)
-        .spawn() {
-            Ok(mut child) => {
-                let mut status = child.try_wait();
-                loop {
-                    match status {
-                        Ok(Some(_)) => break,
-                        Ok(None) => {},
-                        _ => {}
+    if !command.is_empty() {
+        match Command::new("sh")
+            .arg("-c")
+            .arg(command)
+            .spawn() {
+                Ok(mut child) => {
+                    let mut status = child.try_wait();
+                    loop {
+                        match status {
+                            Ok(Some(_)) => break,
+                            Ok(None) => {},
+                            _ => {}
+                        }
+                        status = child.try_wait();
                     }
-                    status = child.try_wait();
-                }
-            },
-            _ => {}
-        }
+                },
+                _ => {}
+            }
+    }
 }
 
 fn run_command_in_directory(directory: String, command: String) {
-    match Command::new("sh")
-        .current_dir(directory)
-        .arg("-c")
-        .arg(command)
-        .spawn() {
-            Ok(mut child) => {
-                let mut status = child.try_wait();
-                loop {
-                    match status {
-                        Ok(Some(_)) => break,
-                        Ok(None) => {},
-                        _ => {}
+    if !command.is_empty() {
+        match Command::new("sh")
+            .current_dir(directory)
+            .arg("-c")
+            .arg(command)
+            .spawn() {
+                Ok(mut child) => {
+                    let mut status = child.try_wait();
+                    loop {
+                        match status {
+                            Ok(Some(_)) => break,
+                            Ok(None) => {},
+                            _ => {}
+                        }
+                        status = child.try_wait();
                     }
-                    status = child.try_wait();
-                }
-            },
-            _ => {}
-        }
+                },
+                _ => {}
+            }
+    }
 }
 
 pub fn run_action(config: &Config, name: String) {
