@@ -10,6 +10,7 @@ use crate::lib::{
 use string_template::Template;
 
 use std::process::Command;
+use std::path::Path;
 use std::collections::HashMap;
 
 pub fn run(config: &Config, names: Values<'_>) {
@@ -30,6 +31,63 @@ pub fn run_action(config: &Config, name: String) {
             }
         },
         None => panic!("No known action named \"{}\".", name)
+    }
+}
+
+pub fn run_repository_sync(config: &Config, name: String) {
+    let repository = config.repositories.get(&name.to_string());
+    match repository {
+        Some(repository) => {
+            if !repository.disabled {
+                let location = &repository.location;
+                if !Path::new(&location).exists() {
+                    if repository.auto_create {
+                        run_repository_creation(config, name);
+                    }
+                } else {
+                    let mut options: HashMap<&str, &str> = HashMap::new();
+                    for (key, value) in &repository.options {
+                        options.insert(key, value);
+                    }
+                    let repo_type = config.repo_types.get(&repository.repo_type);
+                    match repo_type {
+                        Some(repo_type) => {
+                            Command::new("sh")
+                                .current_dir(location)
+                                .arg("-c")
+                                .arg(Template::new(&repo_type.pre_inward).render(&options))
+                                .spawn();
+
+                            Command::new("sh")
+                                .current_dir(location)
+                                .arg("-c")
+                                .arg(Template::new(&repo_type.inward).render(&options))
+                                .spawn();
+                            
+                            Command::new("sh")
+                                .current_dir(location)
+                                .arg("-c")
+                                .arg(Template::new(&repo_type.post_inward).render(&options))
+                                .spawn();
+                            
+                            Command::new("sh")
+                                .current_dir(location)
+                                .arg("-c")
+                                .arg(Template::new(&repo_type.outward).render(&options))
+                                .spawn();
+                            
+                            Command::new("sh")
+                                .current_dir(location)
+                                .arg("-c")
+                                .arg(Template::new(&repo_type.post_outward).render(&options))
+                                .spawn();
+                        },
+                        None => panic!("No known repository type named \"{}\".", &repository.repo_type)
+                    }
+                }
+            }
+        },
+        None => panic!("No known repository named \"{}\".", name)
     }
 }
 

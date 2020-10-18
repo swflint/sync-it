@@ -12,17 +12,17 @@ pub struct RepoType {
     #[serde(default)]
     pub create: String,
     #[serde(default)]
-    inward: String,
+    pub inward: String,
     #[serde(default)]
-    outward: String,
+    pub outward: String,
     #[serde(default)]
     status: String,
     #[serde(default)]
-    pre_inward: String,
+    pub pre_inward: String,
     #[serde(default)]
-    post_inward: String,
+    pub post_inward: String,
     #[serde(default)]
-    post_outward: String,
+    pub post_outward: String,
 }
 
 pub fn add(config: &mut Config, name: &String, description: &String, create: &String, inward: &String, outward: &String, status: &String, pre_inward: &String, post_inward: &String, post_outward: &String) {
