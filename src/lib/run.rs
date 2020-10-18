@@ -24,11 +24,15 @@ fn run_command(command: String) {
         .arg("-c")
         .arg(command)
         .spawn() {
-            Ok(mut child) => while let status = child.try_wait() {
-                match status {
-                    Ok(Some(_)) => break,
-                    Ok(None) => {},
-                    _ => {}
+            Ok(mut child) => {
+                let mut status = child.try_wait();
+                loop {
+                    match status {
+                        Ok(Some(_)) => break,
+                        Ok(None) => {},
+                        _ => {}
+                    }
+                    status = child.try_wait();
                 }
             },
             _ => {}
@@ -41,11 +45,15 @@ fn run_command_in_directory(directory: String, command: String) {
         .arg("-c")
         .arg(command)
         .spawn() {
-            Ok(mut child) => while let status = child.try_wait() {
-                match status {
-                    Ok(Some(_)) => break,
-                    Ok(None) => {},
-                    _ => {}
+            Ok(mut child) => {
+                let mut status = child.try_wait();
+                loop {
+                    match status {
+                        Ok(Some(_)) => break,
+                        Ok(None) => {},
+                        _ => {}
+                    }
+                    status = child.try_wait();
                 }
             },
             _ => {}
