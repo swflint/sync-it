@@ -17,6 +17,7 @@ pub fn run(config: &Config, names: Values<'_>) {
         println!("Running {}...", name)
     }
 }
+
 pub fn run_action(config: &Config, name: String) {
     let action = config.actions.get(&name.to_string());
     match action {
