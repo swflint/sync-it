@@ -112,7 +112,7 @@ subcommands:
         - add:
             about: Add a repo to a group
             args:
-              - group:
+              - name:
                   index: 1
                   value_name: GROUP_NAME
                   help: The name of the group
@@ -125,7 +125,7 @@ subcommands:
         - act:
             about: Add action to a group
             args:
-              - group:
+              - name:
                    index: 1
                    value_name: GROUP_NAME
                    help: The name of the group
@@ -138,7 +138,7 @@ subcommands:
         - remove:
             about: Remove a repo from a group
             args:
-              - group:
+              - name:
                   index: 1
                   value_name: GROUP_NAME
                   help: The name of the group
@@ -151,7 +151,7 @@ subcommands:
         - drop:
             about: Remove a group
             args:
-              - group:
+              - name:
                   index: 1
                   value_name: GROUP_NAME
                   help: The name of the group
