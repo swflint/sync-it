@@ -19,15 +19,45 @@ pub fn run(config: &Config, names: Values<'_>) {
     }
 }
 
+fn run_command(command: String) {
+    match Command::new("sh")
+        .arg("-c")
+        .arg(command)
+        .spawn() {
+            Ok(mut child) => while let status = child.try_wait() {
+                match status {
+                    Ok(Some(_)) => break,
+                    Ok(None) => {},
+                    _ => {}
+                }
+            },
+            _ => {}
+        }
+}
+
+fn run_command_in_directory(directory: String, command: String) {
+    match Command::new("sh")
+        .current_dir(directory)
+        .arg("-c")
+        .arg(command)
+        .spawn() {
+            Ok(mut child) => while let status = child.try_wait() {
+                match status {
+                    Ok(Some(_)) => break,
+                    Ok(None) => {},
+                    _ => {}
+                }
+            },
+            _ => {}
+        }
+}
+
 pub fn run_action(config: &Config, name: String) {
     let action = config.actions.get(&name.to_string());
     match action {
         Some(action) => {
             if !action.disabled {
-                Command::new("sh")
-                    .arg("-c")
-                    .arg(&action.command)
-                    .spawn();
+                run_command(action.command.to_string());
             }
         },
         None => panic!("No known action named \"{}\".", name)
@@ -52,35 +82,11 @@ pub fn run_repository_sync(config: &Config, name: String) {
                     let repo_type = config.repo_types.get(&repository.repo_type);
                     match repo_type {
                         Some(repo_type) => {
-                            Command::new("sh")
-                                .current_dir(location)
-                                .arg("-c")
-                                .arg(Template::new(&repo_type.pre_inward).render(&options))
-                                .spawn();
-
-                            Command::new("sh")
-                                .current_dir(location)
-                                .arg("-c")
-                                .arg(Template::new(&repo_type.inward).render(&options))
-                                .spawn();
-                            
-                            Command::new("sh")
-                                .current_dir(location)
-                                .arg("-c")
-                                .arg(Template::new(&repo_type.post_inward).render(&options))
-                                .spawn();
-                            
-                            Command::new("sh")
-                                .current_dir(location)
-                                .arg("-c")
-                                .arg(Template::new(&repo_type.outward).render(&options))
-                                .spawn();
-                            
-                            Command::new("sh")
-                                .current_dir(location)
-                                .arg("-c")
-                                .arg(Template::new(&repo_type.post_outward).render(&options))
-                                .spawn();
+                            run_command_in_directory(location.to_string(), Template::new(&repo_type.pre_inward).render(&options));
+                            run_command_in_directory(location.to_string(), Template::new(&repo_type.inward).render(&options));
+                            run_command_in_directory(location.to_string(), Template::new(&repo_type.post_inward).render(&options));
+                            run_command_in_directory(location.to_string(), Template::new(&repo_type.outward).render(&options));
+                            run_command_in_directory(location.to_string(), Template::new(&repo_type.post_outward).render(&options));
                         },
                         None => panic!("No known repository type named \"{}\".", &repository.repo_type)
                     }
@@ -105,11 +111,7 @@ pub fn run_repository_creation(config: &Config, name: String) {
                             options.insert(key, value);
                         }
                         options.insert("location", &repository.location);
-                        let create_command = Template::new(&repository_type.create);
-                        Command::new("sh")
-                            .arg("-c")
-                            .arg(create_command.render(&options))
-                            .spawn();
+                        run_command(Template::new(&repository_type.create).render(&options));
                     }
                 },
                 None => panic!("No known repository type named \"{}\".", repository_type_name)
