@@ -10,7 +10,7 @@ pub struct RepoType {
     #[serde(default)]
     description: String,
     #[serde(default)]
-    create: String,
+    pub create: String,
     #[serde(default)]
     inward: String,
     #[serde(default)]

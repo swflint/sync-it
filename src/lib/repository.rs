@@ -9,15 +9,15 @@ pub struct Repository {
     #[serde(default)]
     name: String,
     #[serde(default)]
-    location: String,
+    pub location: String,
     #[serde(default)]
-    repo_type: String,
+    pub repo_type: String,
     #[serde(default)]
-    auto_create: bool,
+    pub auto_create: bool,
     #[serde(default)]
-    disabled: bool,
+    pub disabled: bool,
     #[serde(default)]
-    options: HashMap<String, String>,
+    pub options: HashMap<String, String>,
 }
 
 pub fn register(config: &mut Config, name: &String, location: String, repo_type: String, options_strings: Vec<String>) {
