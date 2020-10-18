@@ -1,5 +1,4 @@
 name: sync-it
-version: "0.1.0"
 author: Samuel W. Flint <swflint@flintfam.org>
 about: Synchronize directories flexibly
 settings:
