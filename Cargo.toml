@@ -1,6 +1,6 @@
 [package]
 name = "sync-it"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Samuel W. Flint <swflint@flintfam.org>"]
 edition = "2018"
 
