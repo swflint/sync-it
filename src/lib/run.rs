@@ -118,3 +118,24 @@ pub fn run_repository_creation(config: &Config, name: String) {
         None => panic!("No known repository named \"{}\".", name)
     }
 }
+
+pub fn run_group(config: &Config, name: String) {
+    let group = config.groups.get(&name.to_string());
+    match group {
+        Some(group) => {
+            for member in &group.members {
+                if config.repositories.contains_key(member) {
+                    run_repository_sync(&config, member.to_string());
+                } else if config.groups.contains_key(member) {
+                    run_group(&config, member.to_string());
+                } else {
+                    println!("\"{}\" is neither a group nor a repository.", member);
+                }
+            }
+            for action in &group.actions_after {
+                run_action(&config, action.to_string());
+            }
+        },
+        None => panic!("No known group named \"{}\".", name)
+    }
+}

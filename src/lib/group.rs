@@ -8,9 +8,9 @@ pub struct Group {
     #[serde(default)]
     name: String,
     #[serde(default)]
-    actions_after: Vec<String>,
+    pub actions_after: Vec<String>,
     #[serde(default)]
-    members: Vec<String>,
+    pub members: Vec<String>,
 }
 
 pub fn add(config: &mut Config, name: &String) {
