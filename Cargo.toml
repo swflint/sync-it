@@ -12,3 +12,4 @@ serde = {version = "1.0.116", features = ["derive"]}
 clap = {version = "2.33.3", features = ["yaml"]}
 yaml-rust = "0.3.5"
 home = "0.5.3"
+string_template = "0.2.1"
