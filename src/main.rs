@@ -39,10 +39,14 @@ fn main() {
                         Some(string) => string.to_string(),
                         None => location.file_name().unwrap().to_str().unwrap().to_string()
                     };
-                    let option_strings_in: Vec<&str> = matches.values_of("options").unwrap().collect();
                     let mut option_strings: Vec<String> = Vec::new();
-                    for str_thing in option_strings_in {
-                        option_strings.push(str_thing.to_string())
+                    match matches.values_of("options") {
+                        Some(option_strings_in) => {
+                            for str_thing in option_strings_in {
+                                option_strings.push(str_thing.to_string())
+                            }
+                        },
+                        None => {}
                     }
                     repository::register(&mut configuration, &name, location_string, type_name, option_strings);
                 },
