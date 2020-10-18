@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::fmt;
 
 use crate::lib::config::Config;
@@ -17,11 +17,11 @@ pub struct Repository {
     #[serde(default)]
     pub disabled: bool,
     #[serde(default)]
-    pub options: HashMap<String, String>,
+    pub options: BTreeMap<String, String>,
 }
 
 pub fn register(config: &mut Config, name: &String, location: String, repo_type: String, options_strings: Vec<String>) {
-    let mut options_map: HashMap<String, String> = HashMap::new();
+    let mut options_map: BTreeMap<String, String> = BTreeMap::new();
     for option in options_strings {
         let option_pair: Vec<&str> = option.split("=").collect();
         options_map.insert(option_pair[0].to_string(), option_pair[1].to_string());

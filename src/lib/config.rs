@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::path::PathBuf;
 use std::fs::{
     File,
@@ -29,13 +29,13 @@ use crate::lib::group::{
 #[derive(Serialize, Deserialize)]
 pub struct Config {
     #[serde(rename(serialize = "repo_type", deserialize = "repo_type"), default)]
-    pub repo_types: HashMap<String, RepoType>,
+    pub repo_types: BTreeMap<String, RepoType>,
     #[serde(rename(serialize = "repository", deserialize = "repository"), default)]
-    pub repositories: HashMap<String, Repository>,
+    pub repositories: BTreeMap<String, Repository>,
     #[serde(rename(serialize = "action", deserialize = "action"), default)]
-    pub actions: HashMap<String, Action>,
+    pub actions: BTreeMap<String, Action>,
     #[serde(rename(serialize = "group", deserialize = "group"), default)]
-    pub groups: HashMap<String, Group>,
+    pub groups: BTreeMap<String, Group>,
 }
 
 pub fn find_config_file(original: Option<&str>) -> PathBuf {
@@ -58,10 +58,10 @@ pub fn read_configuration_file(filename: &PathBuf) -> Config {
     match text {
         Err(_) => {
             let config = Config {
-                repo_types: HashMap::new(),
-                repositories: HashMap::new(),
-                actions: HashMap::new(),
-                groups: HashMap::new()
+                repo_types: BTreeMap::new(),
+                repositories: BTreeMap::new(),
+                actions: BTreeMap::new(),
+                groups: BTreeMap::new()
             };
             return config;
         },
@@ -70,7 +70,7 @@ pub fn read_configuration_file(filename: &PathBuf) -> Config {
 }
 
 pub fn write_configuration_file(filename: PathBuf, configuration: Config) -> std::io::Result<()> {
-    let toml = toml::to_string(&configuration).unwrap();
+    let toml = toml::to_string_pretty(&configuration).unwrap();
     let mut file = File::create(filename)?;
     file.write_all(toml.as_bytes())?;
     Ok(())

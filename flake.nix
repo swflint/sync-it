@@ -20,7 +20,7 @@
 
             src = ./.;
 
-            cargoSha256 = "Kk54lGkqD8TgUDsfKuu2d/EZMDJPIPueRexFHzeLGTg=";
+            cargoSha256 = "LVE4SvTxwYM0J/8FSzo5aeXeOD/FW9gomMQwVjYyulg=";
 
             meta = with pkgs.stdenv.lib; {
               description = "A simple, customizable synchronization tool.";
