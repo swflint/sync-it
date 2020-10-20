@@ -95,6 +95,7 @@ pub fn run_repository_sync(config: &Config, name: String) {
                     let repo_type = config.repo_types.get(&repository.repo_type);
                     match repo_type {
                         Some(repo_type) => {
+                            println!("\n\nRepository {} ({}):", name, location);
                             run_command_in_directory(location.to_string(),
                                                      Template::new(&repo_type.pre_inward).render(&options));
                             run_command_in_directory(location.to_string(),
