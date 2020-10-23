@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::fmt;
+use std::collections::BTreeSet;
 
 use crate::lib::config::Config;
 
@@ -10,14 +11,14 @@ pub struct Group {
     #[serde(default)]
     pub actions_after: Vec<String>,
     #[serde(default)]
-    pub members: Vec<String>,
+    pub members: BTreeSet<String>,
 }
 
 pub fn add(config: &mut Config, name: &String) {
     let group = Group {
         name: name.to_string(),
         actions_after: Vec::new(),
-        members: Vec::new()
+        members: BTreeSet::new()
     };
     config.groups.insert(name.to_string(), group);
     config.is_changed = true;
@@ -26,7 +27,7 @@ pub fn add(config: &mut Config, name: &String) {
 pub fn add_repo(config: &mut Config, name: &String, repo: &String) {
     match config.groups.get_mut(&name.to_string()) {
         Some(group) => {
-            group.members.push(repo.to_string());
+            group.members.insert(repo.to_string());
             config.is_changed = true;
         },
         None => panic!("No known group named \"{}\".", name)
@@ -46,7 +47,8 @@ pub fn add_action(config: &mut Config, name: &String, action: &String) {
 pub fn remove_repo(config: &mut Config, name: &String, repo: &String) {
     match config.groups.get_mut(&name.to_string()) {
         Some(group) => {
-            group.members.retain(|r| r != repo);
+            // group.members.retain(|r| r != repo);
+            group.members.remove(repo);
             config.is_changed = true;
         }
         None => panic!("No known group named \"{}\".", name)

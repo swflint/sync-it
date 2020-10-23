@@ -9,45 +9,45 @@
   outputs = { self, nixpkgs, utils }:
     utils.lib.eachDefaultSystem (
       system:
-        let
-          pkgs = import nixpkgs { inherit system; };
-        in
-          rec {
-            packages = rec {
+      let
+        pkgs = import nixpkgs { inherit system; };
+      in
+      rec {
+        packages = rec {
 
-              sync-it = pkgs.rustPlatform.buildRustPackage rec {
-                name = "sync-it";
-                version = "1.2.0";
+          sync-it = pkgs.rustPlatform.buildRustPackage rec {
+            name = "sync-it";
+            version = "1.2.1";
 
-                src = ./.;
+            src = ./.;
 
-                cargoSha256 = "ctv+0OgWtNh9ZO+ZCh+ehU8oOU2tQPQKNS7NbRgVHl4=";
+            cargoSha256 = "Ey6PJVmJXd2wCXemKfAHJ+EDVPtQezayuvOjQGQNGeU=";
 
-                meta = with pkgs.stdenv.lib; {
-                  description = "A simple, customizable synchronization tool.";
-                  license = licenses.gpl3Plus;
-                  maintainers = with maintainers; [ swflint ];
-                };
-              };
-
-              devEnvironment = pkgs.mkShell {
-                name = "sync-it-dev-environment";
-
-                buildInputs = [
-                  pkgs.pre-commit
-                  pkgs.rustc
-                  pkgs.cargo
-                  pkgs.rls
-                  pkgs.clippy
-                  pkgs.rustfmt
-                  pkgs.sloc
-                ];
-              };
-
+            meta = with pkgs.stdenv.lib; {
+              description = "A simple, customizable synchronization tool.";
+              license = licenses.gpl3Plus;
+              maintainers = with maintainers; [ swflint ];
             };
+          };
 
-            defaultPackage = packages.sync-it;
-            devShell = packages.devEnvironment;
-          }
+          devEnvironment = pkgs.mkShell {
+            name = "sync-it-dev-environment";
+
+            buildInputs = [
+              pkgs.pre-commit
+              pkgs.rustc
+              pkgs.cargo
+              pkgs.rls
+              pkgs.clippy
+              pkgs.rustfmt
+              pkgs.sloc
+            ];
+          };
+
+        };
+
+        defaultPackage = packages.sync-it;
+        devShell = packages.devEnvironment;
+      }
     );
 }
