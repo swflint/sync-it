@@ -27,8 +27,13 @@ pub fn add(config: &mut Config, name: &String) {
 pub fn add_repo(config: &mut Config, name: &String, repo: &String) {
     match config.groups.get_mut(&name.to_string()) {
         Some(group) => {
-            group.members.insert(repo.to_string());
-            config.is_changed = true;
+            match config.repositories.get(&repo.to_string()) {
+                Some(_) => {
+                    group.members.insert(repo.to_string());
+                    config.is_changed = true;
+                },
+                None => panic!("No known repository named \"{}\".", repo)
+            }
         },
         None => panic!("No known group named \"{}\".", name)
     }
@@ -37,8 +42,13 @@ pub fn add_repo(config: &mut Config, name: &String, repo: &String) {
 pub fn add_action(config: &mut Config, name: &String, action: &String) {
     match config.groups.get_mut(&name.to_string()) {
         Some(group) => {
-            group.actions_after.push(action.to_string());
-            config.is_changed = true;
+            match config.actions.get(&action.to_string()) {
+                Some(_) => {
+                    group.actions_after.push(action.to_string());
+                    config.is_changed = true;
+                },
+                None => panic!("No known action named \"{}\".", action)
+            }
         },
         None => panic!("No known group named \"{}\".", name)
     }
@@ -47,7 +57,6 @@ pub fn add_action(config: &mut Config, name: &String, action: &String) {
 pub fn remove_repo(config: &mut Config, name: &String, repo: &String) {
     match config.groups.get_mut(&name.to_string()) {
         Some(group) => {
-            // group.members.retain(|r| r != repo);
             group.members.remove(repo);
             config.is_changed = true;
         }
