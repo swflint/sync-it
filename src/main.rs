@@ -70,6 +70,10 @@ fn main() {
                         _ => {}
                     }
                 },
+                Some("remove") => if let Some(matches) = matches.subcommand_matches("remove") {
+                    let name = matches.value_of("name").unwrap().to_string();
+                    repository::remove_repo(&mut configuration, &name);
+                },
                 Some("show") => if let Some(matches) = matches.subcommand_matches("show") {
                     let name = matches.value_of("name").unwrap().to_string();
                     let repository = configuration.repositories.get(&name);

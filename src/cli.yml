@@ -81,6 +81,14 @@ subcommands:
                   help: Type-specific options
                   multiple: true
                   takes_value: true
+        - remove:
+            about: Remove a repository from the configuration
+            args:
+              - name:
+                  index: 1
+                  value_name: NAME
+                  help: The name of the repository
+                  required: true
         - show:
             about: Show information about a repository
             args:

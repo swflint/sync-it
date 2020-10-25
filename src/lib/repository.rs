@@ -3,6 +3,7 @@ use std::collections::BTreeMap;
 use std::fmt;
 
 use crate::lib::config::Config;
+use crate::lib::group;
 
 #[derive(Serialize, Deserialize)]
 pub struct Repository {
@@ -70,6 +71,12 @@ pub fn update_options(config: &mut Config, name: &String, options_strings: Vec<S
         }
         None => panic!("No known repository named \"{}\".", name)
     }
+}
+
+pub fn remove_repo(mut config: &mut Config, name: &String) {
+    config.repositories.remove(&name.to_string());
+    config.is_changed = true;
+    group::remove_repo_from_groups(&mut config, name);
 }
 
 impl fmt::Display for Repository {

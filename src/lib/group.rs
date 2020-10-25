@@ -64,9 +64,19 @@ pub fn remove_repo(config: &mut Config, name: &String, repo: &String) {
     }
 }
 
+pub fn remove_repo_from_groups(config: &mut Config, repo: &String) {
+    // let ref tmp_groups = &config.groups;
+    for (_group_name, group) in &mut config.groups {
+        group.members.remove(repo);
+    }
+}
+
 pub fn remove_group(config: &mut Config, name: &String) {
     config.groups.remove(&name.to_string());
     config.is_changed = true;
+    for (_name, group) in &mut config.groups {
+        group.members.remove(name);
+    }
 }
 
 impl fmt::Display for Group {
