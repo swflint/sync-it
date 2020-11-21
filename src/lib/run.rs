@@ -81,7 +81,13 @@ pub fn run_repository_sync(config: &Config, name: String) {
     match repository {
         Some(repository) => {
             if !repository.disabled {
-                let location = &repository.location;
+                let location = match config.is_not_default {
+                    true => {
+                        let thing = config.base_path.join(Path::new(&repository.location.to_string()));
+                        thing.to_str().unwrap()
+                    },
+                    _ => repository.location.as_str()
+                };
                 if !Path::new(&location).exists() {
                     if repository.auto_create {
                         run_repository_creation(config, name);

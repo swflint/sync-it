@@ -3,6 +3,7 @@ extern crate clap;
 use clap::App;
 
 use std::env;
+use std::path::{Path, PathBuf};
 
 mod lib;
 
@@ -27,13 +28,21 @@ fn main() {
     let config_file = find_config_file(matches.value_of("config"));
     let mut configuration: Config = read_configuration_file(&config_file);
 
+    if matches.is_present("config") {
+        configuration.is_not_default = true;
+        configuration.base_path = Path::new(matches.value_of("config").unwrap()).canonicalize().unwrap().parent().unwrap().to_path_buf();
+    }
+
     match matches.subcommand_name() {
         Some("run") => run::run(&configuration, matches.subcommand_matches("run").unwrap().values_of("name").unwrap()),
         Some("repository") => if let Some(matches) = matches.subcommand_matches("repository") {
             match matches.subcommand_name() {
                 Some("register") => if let Some(matches) = matches.subcommand_matches("register") {
                     let type_name = matches.value_of("type").unwrap().to_string();
-                    let location = env::current_dir().unwrap();
+                    let location = match configuration.is_not_default {
+                        true => env::current_dir().unwrap().strip_prefix(&configuration.base_path).unwrap().to_path_buf(),
+                        _ => env::current_dir().unwrap(),
+                    };
                     let location_string = location.to_str().unwrap().to_string();
                     let name = match matches.value_of("name") {
                         Some(string) => string.to_string(),

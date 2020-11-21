@@ -30,6 +30,10 @@ use crate::lib::group::{
 pub struct Config {
     #[serde(skip)]
     pub is_changed: bool,
+    #[serde(skip)]
+    pub is_not_default: bool,
+    #[serde(skip)]
+    pub base_path: PathBuf,
     #[serde(rename(serialize = "repo_type", deserialize = "repo_type"), default)]
     pub repo_types: BTreeMap<String, RepoType>,
     #[serde(rename(serialize = "repository", deserialize = "repository"), default)]
@@ -61,6 +65,8 @@ pub fn read_configuration_file(filename: &PathBuf) -> Config {
         Err(_) => {
             let config = Config {
                 is_changed: true,
+                is_not_default: false,
+                base_path: filename.parent().unwrap().to_path_buf(),
                 repo_types: BTreeMap::new(),
                 repositories: BTreeMap::new(),
                 actions: BTreeMap::new(),
