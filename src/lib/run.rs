@@ -84,9 +84,9 @@ pub fn run_repository_sync(config: &Config, name: String) {
                 let location = match config.is_not_default {
                     true => {
                         let thing = config.base_path.join(Path::new(&repository.location.to_string()));
-                        thing.to_str().unwrap()
+                        String::from(thing.to_str().unwrap())
                     },
-                    _ => repository.location.as_str()
+                    _ => repository.location.clone()
                 };
                 if !Path::new(&location).exists() {
                     if repository.auto_create {
@@ -97,7 +97,7 @@ pub fn run_repository_sync(config: &Config, name: String) {
                     for (key, value) in &repository.options {
                         options.insert(key, value);
                     }
-                    options.insert("location", location);
+                    options.insert("location", &location);
                     let repo_type = config.repo_types.get(&repository.repo_type);
                     match repo_type {
                         Some(repo_type) => {
