@@ -27,6 +27,12 @@ subcommands:
             multiple: true
             value_name: REPO_OR_GROUP
             help: The name of a repository or group to sync
+        - command:
+            short: C
+            long: comand
+            value_name: COMMAND
+            help: Run named command
+            takes_value: true
   - repository:
       about: Create and manage repositories
       settings:

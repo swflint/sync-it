@@ -34,7 +34,15 @@ fn main() {
     }
 
     match matches.subcommand_name() {
-        Some("run") => run::run(&configuration, matches.subcommand_matches("run").unwrap().values_of("name").unwrap()),
+        Some("run") => if let Some(matches) = matches.subcommand_matches("run") {
+            if matches.is_present("command") {
+                println!("Running with command");
+                run::run_with_command(&configuration, matches.value_of("command").unwrap().to_string(),
+                                      matches.values_of("name").unwrap());
+            } else {
+                run::run(&configuration, matches.values_of("name").unwrap());
+            }
+        },
         Some("repository") => if let Some(matches) = matches.subcommand_matches("repository") {
             match matches.subcommand_name() {
                 Some("register") => if let Some(matches) = matches.subcommand_matches("register") {
