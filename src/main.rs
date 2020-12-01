@@ -1,11 +1,12 @@
 #[macro_use]
 extern crate clap;
-use clap::App;
+// use clap::App;
 
 use std::env;
 use std::path::Path;
 
 mod lib;
+mod cli;
 
 use crate::lib::{
     config::{
@@ -22,8 +23,7 @@ use crate::lib::{
 };
 
 fn main() {
-    let yaml = load_yaml!("cli.yml");
-    let matches = App::from_yaml(yaml).version(crate_version!()).get_matches();
+    let matches = cli::build_cli().get_matches();
 
     let config_file = find_config_file(matches.value_of("config"));
     let mut configuration: Config = read_configuration_file(&config_file);
