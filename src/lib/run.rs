@@ -19,6 +19,18 @@ pub fn run(config: &Config, names: Values<'_>) {
     }
 }
 
+pub fn run_with_command(config: &Config, command: String, names: Values<'_>) {
+    for name in names {
+        if config.repositories.contains_key(name) {
+            run_named_command(&config, name.to_string(), &command);
+        } else if config.groups.contains_key(name) {
+            run_group_with_command(&config, name.to_string(), &command);
+        } else {
+            println!("\"{}\" is neither a group nor a repository.", name);
+        }
+    }
+}
+
 fn run_command(command: String) {
     if !command.is_empty() {
         match Command::new("sh")
@@ -73,6 +85,43 @@ pub fn run_action(config: &Config, name: String) {
             }
         },
         None => panic!("No known action named \"{}\".", name)
+    }
+}
+
+pub fn run_named_command(config: &Config, repo: String, command: &String) {
+    match config.repositories.get(&repo) {
+        Some(repository) => {
+            if !repository.disabled {
+                let location = match config.is_not_default {
+                    true => {
+                        let thing = config.base_path.join(Path::new(&repository.location.to_string()));
+                        String::from(thing.to_str().unwrap())
+                    },
+                    _ => repository.location.clone()
+                };
+                if Path::new(&location).exists() {
+                    let mut options: HashMap<&str, &str> = HashMap::new();
+                    for (key, value) in &repository.options {
+                        options.insert(key, value);
+                    }
+                    options.insert("location", &location);
+                    match config.repo_types.get(&repository.repo_type) {
+                        Some(repo_type) => {
+                            match repo_type.commands.get(command) {
+                                Some(command_string) => {
+                                    println!("\n\nRepository {} ({}):", repo, location);
+                                    run_command_in_directory(location.to_string(),
+                                                             Template::new(&command_string).render(&options));
+                                },
+                                None => {}
+                            }
+                        },
+                        None => panic!("No repository type named \"{}\".", repository.repo_type)
+                    }
+                }
+            }
+        }
+        None => panic!("No known repository named \"{}\".", repo)
     }
 }
 
@@ -155,6 +204,28 @@ pub fn run_group(config: &Config, name: String) {
                     run_repository_sync(&config, member.to_string());
                 } else if config.groups.contains_key(member) {
                     run_group(&config, member.to_string());
+                } else {
+                    println!("\"{}\" is neither a group nor a repository.", member);
+                }
+            }
+            for action in &group.actions_after {
+                run_action(&config, action.to_string());
+            }
+        },
+        None => panic!("No known group named \"{}\".", name)
+    }
+}
+
+
+pub fn run_group_with_command(config: &Config, name: String, command: &String) {
+    let group = config.groups.get(&name.to_string());
+    match group {
+        Some(group) => {
+            for member in &group.members {
+                if config.repositories.contains_key(member) {
+                    run_named_command(&config, member.to_string(), &command);
+                } else if config.groups.contains_key(member) {
+                    run_group_with_command(&config, member.to_string(), &command);
                 } else {
                     println!("\"{}\" is neither a group nor a repository.", member);
                 }
