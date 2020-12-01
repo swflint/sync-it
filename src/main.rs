@@ -255,7 +255,29 @@ fn main() {
                         Some(post_outward) => repotype::update_post_outward(&mut configuration, &name, &post_outward.to_string()),
                         _ => {}
                     }
-                }
+                },
+                Some("command") => if let Some(matches) = matches.subcommand_matches("command") {
+                    match matches.subcommand_name() {
+                        Some("add") => if let Some(matches) = matches.subcommand_matches("add") {
+                            let type_name = matches.value_of("type").unwrap().to_string();
+                            let name = matches.value_of("name").unwrap().to_string();
+                            let command = matches.value_of("command").unwrap().to_string();
+                            repotype::add_command(&mut configuration, &type_name, &name, &command);
+                        },
+                        Some("change") => if let Some(matches) = matches.subcommand_matches("change") {
+                            let type_name = matches.value_of("type").unwrap().to_string();
+                            let name = matches.value_of("name").unwrap().to_string();
+                            let command = matches.value_of("command").unwrap().to_string();
+                            repotype::change_command(&mut configuration, &type_name, &name, &command);
+                        },
+                        Some("remove") => if let Some(matches) = matches.subcommand_matches("remove") {
+                            let type_name = matches.value_of("type").unwrap().to_string();
+                            let name = matches.value_of("name").unwrap().to_string();
+                            repotype::remove_command(&mut configuration, &type_name, &name);
+                        },
+                        _ => panic!("Something has gone horribly wrong...")
+                    }
+                },
                 Some("show") => if let Some(matches) = matches.subcommand_matches("show") {
                     let name = matches.value_of("name").unwrap().to_string();
                     let repo_type = configuration.repo_types.get(&name);

@@ -260,6 +260,60 @@ subcommands:
                   long: post-outward
                   takes_value: true
                   help: Command describing post-outward action
+        - command:
+            about: Manage commands in a repo type
+            settings:
+              - SubcommandRequired
+            subcommands:
+              - add:
+                  about: Create a new command
+                  args:
+                    - type:
+                        index: 1
+                        value_name: REPO_TYPE
+                        help: Repository Type
+                        required: true
+                    - name:
+                        index: 2
+                        value_name: COMMAND_NAME
+                        help: Command Name
+                        required: true
+                    - command:
+                        index: 3
+                        value_name: COMMAND
+                        help: Command
+                        required: true
+              - change:
+                  about: Change a command
+                  args:
+                    - type:
+                        index: 1
+                        value_name: REPO_TYPE
+                        help: Repository Type
+                        required: true
+                    - name:
+                        index: 2
+                        value_name: COMMAND_NAME
+                        help: Command Name
+                        required: true
+                    - command:
+                        index: 3
+                        value_name: COMMAND
+                        help: Command
+                        required: true
+              - remove:
+                  about: Remove a command
+                  args:
+                    - type:
+                        index: 1
+                        value_name: REPO_TYPE
+                        help: Repository Type
+                        required: true
+                    - name:
+                        index: 2
+                        value_name: COMMAND_NAME
+                        help: Command Name
+                        required: true
         - show:
             about: Show information about a type
             args:
