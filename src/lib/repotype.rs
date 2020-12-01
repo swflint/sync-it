@@ -166,6 +166,11 @@ impl fmt::Display for RepoType {
                self.status,
                self.pre_inward,
                self.post_inward,
-               self.post_outward)
+               self.post_outward)?;
+        write!(f, "Additional Commands:\n")?;
+        for command in self.commands.keys() {
+            write!(f, "\t - {}: {}\n", command, &self.commands.get(command).unwrap())?;
+        }
+        write!(f, "")
     }
 }
