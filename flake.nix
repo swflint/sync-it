@@ -17,7 +17,7 @@
 
           sync-it = pkgs.rustPlatform.buildRustPackage rec {
             name = "sync-it";
-            version = "1.3.0";
+            version = "1.4.0";
 
             src = ./.;
 
