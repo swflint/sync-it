@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 use std::fmt;
 
 use crate::lib::config::Config;
@@ -23,6 +24,8 @@ pub struct RepoType {
     pub post_inward: String,
     #[serde(default)]
     pub post_outward: String,
+    #[serde(default)]
+    pub commands: BTreeMap<String,String>
 }
 
 pub fn add(config: &mut Config, name: &String, description: &String, create: &String, inward: &String, outward: &String, status: &String, pre_inward: &String, post_inward: &String, post_outward: &String) {
@@ -35,7 +38,8 @@ pub fn add(config: &mut Config, name: &String, description: &String, create: &St
         status: status.to_string(),
         pre_inward: pre_inward.to_string(),
         post_inward: post_inward.to_string(),
-        post_outward: post_outward.to_string()
+        post_outward: post_outward.to_string(),
+        commands: BTreeMap::new()
     };
     config.repo_types.insert(name.to_string(), repo_type);
     config.is_changed = true;
@@ -118,6 +122,36 @@ pub fn update_post_outward(config: &mut Config, name: &String, post_outward: &St
             config.is_changed = true;
         },
         None => panic!("No known repository type named \"{}\".", name)
+    }
+}
+
+pub fn add_command(config: &mut Config, type_name: &String, name: &String, command: &String) {
+    match config.repo_types.get_mut(&type_name.to_string()) {
+        Some(repo_type) => {
+            repo_type.commands.insert(name.to_string(), command.to_string());
+            config.is_changed = true;
+        },
+        None => panic!("No known repository type named \"{}\".", type_name)
+    }
+}
+
+pub fn change_command(config: &mut Config, type_name: &String, name: &String, command: &String) {
+    match config.repo_types.get_mut(&type_name.to_string()) {
+        Some(repo_type) => {
+            repo_type.commands.insert(name.to_string(), command.to_string());
+            config.is_changed = true;
+        },
+        None => panic!("No known repository type named \"{}\".", type_name)
+    }
+}
+
+pub fn remove_command(config: &mut Config, type_name: &String, name: &String) {
+    match config.repo_types.get_mut(&type_name.to_string()) {
+        Some(repo_type) => {
+            repo_type.commands.remove(&name.to_string());
+            config.is_changed = true;
+        },
+        None => panic!("No known repository type named \"{}\".", type_name)
     }
 }
 
