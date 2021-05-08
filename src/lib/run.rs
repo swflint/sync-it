@@ -13,6 +13,10 @@ pub fn run(config: &Config, names: Values<'_>) {
             run_repository_sync(&config, name.to_string());
         } else if config.groups.contains_key(name) {
             run_group(&config, name.to_string());
+        } else if name == "all" {
+            for repo_name in config.repositories.keys() {
+                run_repository_sync(&config, repo_name.to_string());
+            }
         } else {
             println!("\"{}\" is neither a group nor a repository.", name);
         }
@@ -25,6 +29,10 @@ pub fn run_with_command(config: &Config, command: String, names: Values<'_>) {
             run_named_command(&config, name.to_string(), &command);
         } else if config.groups.contains_key(name) {
             run_group_with_command(&config, name.to_string(), &command);
+        } else if name == "all" {
+            for repo_name in config.repositories.keys() {
+                run_named_command(&config, repo_name.to_string(), &command);
+            }
         } else {
             println!("\"{}\" is neither a group nor a repository.", name);
         }
