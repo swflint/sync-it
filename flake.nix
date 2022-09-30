@@ -37,7 +37,7 @@
               pkgs.pre-commit
               pkgs.rustc
               pkgs.cargo
-              pkgs.rls
+              pkgs.rust-analyzer
               pkgs.clippy
               pkgs.rustfmt
               pkgs.sloc
