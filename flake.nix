@@ -17,11 +17,11 @@
 
           sync-it = pkgs.rustPlatform.buildRustPackage rec {
             name = "sync-it";
-            version = "2.0.1";
+            version = "2.0.0";
 
             src = ./.;
 
-            cargoSha256 = "FYAmRythvoLUczKT8uYeiiL2ih2LjAW9fbmbYyRP5kc=";
+            cargoSha256 = "B8N7fgi8RTXXzVYfqzbCB3ov6mDIJgFm6HEg3gCuVGA=";
 
             meta = {
               description = "A simple, customizable synchronization tool.";
