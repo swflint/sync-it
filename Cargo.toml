@@ -1,6 +1,6 @@
 [package]
 name = "sync-it"
-version = "1.5.0"
+version = "2.0.0"
 authors = ["Samuel W. Flint <swflint@flintfam.org>"]
 edition = "2018"
 
@@ -9,7 +9,7 @@ edition = "2018"
 [dependencies]
 toml = "0.5.6"
 serde = {version = "1.0.116", features = ["derive"]}
-clap = {version = "2.33.3", features = ["yaml"]}
-yaml-rust = "0.3.5"
+clap = {version = "4.0.2", features = ["cargo"]}
+clap_complete = "4.0.2"
 home = "0.5.3"
 string_template = "0.2.1"

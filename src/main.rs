@@ -1,12 +1,55 @@
-#[macro_use]
-extern crate clap;
-use clap::App;
+// extern crate clap;
+
+use clap::{Command, command, Arg, value_parser, ArgAction, ValueEnum, builder::PossibleValue};
+use clap_complete::{generate, Generator, Shell};
 
 use std::env;
-use std::path::Path;
+use std::io;
 
 mod lib;
 
+
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+enum HumanBool {
+    Yes,
+    No
+}
+
+impl ValueEnum for HumanBool {
+    fn value_variants<'a>() -> &'a [Self] {
+        &[HumanBool::Yes, HumanBool::No]
+    }
+    fn to_possible_value<'a>(&self) -> Option<PossibleValue> {
+        Some(match self {
+            HumanBool::Yes => PossibleValue::new("YES"),
+            HumanBool::No => PossibleValue::new("NO")
+        })
+    }
+}
+
+impl std::fmt::Display for HumanBool {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.to_possible_value()
+            .expect("Values cannot be skipped")
+            .get_name()
+            .fmt(f)
+    }
+}
+
+impl std::str::FromStr for HumanBool {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        for variant in Self::value_variants() {
+            if variant.to_possible_value().unwrap().matches(s, false) {
+                return Ok(*variant)
+            }
+        }
+        Err(format!("Invalid Variant: {}", s))
+    }
+}
+
+
 use crate::lib::{
     config::{
         find_config_file,
@@ -21,291 +64,618 @@ use crate::lib::{
     run
 };
 
+
+fn build_cli() -> Command {
+    command!()
+        .propagate_version(true)
+        .subcommand_required(true)
+        .author("Samuel W. Flint <swflint@flintfam.org>")
+        .about("Synchronize directories flexibly")
+        .arg(Arg::new("config")
+             .short('c')
+             .long("config")
+             .value_name("FILE")
+             .help("Set a custom configuration file"))
+        .subcommand(Command::new("run")
+                    .aliases(["sync", "rr"])
+                    .about("Run synchronization or command for repositories and groups.")
+                    .arg(Arg::new("repo")
+                         .action(ArgAction::Append)
+                         .value_name("REPO_OR_GROUP")
+                         .help("Name or names of repositories/groups to sync"))
+                    .arg(Arg::new("command")
+                         .short('C')
+                         .long("command")
+                         .value_name("COMMAND")
+                         .help("Run named COMMAND in each specified repository")))
+        .subcommand(Command::new("repository")
+                    .about("Create and manage repositories")
+                    .visible_aliases(["repo", "r"])
+                    .subcommand_required(true)
+                    .subcommand(Command::new("list")
+                                .about("List repositories"))
+                    .subcommand(Command::new("register")
+                                .about("Register the current directory as a repository")
+                                .arg(Arg::new("type")
+                                     .required(true)
+                                     .value_name("TYPE")
+                                     .help("Type of repository"))
+                                .arg(Arg::new("repo")
+                                     .long("name")
+                                     .short('n')
+                                     .value_name("REPO")
+                                     .help("Name of repository"))
+                                .arg(Arg::new("options")
+                                     .action(ArgAction::Append)
+                                     .value_name("OPTION=VALUE")
+                                     .help("Type-specific options, in option=value form")))
+                    .subcommand(Command::new("config")
+                                .about("Configure repository")
+                                .arg(Arg::new("repo")
+                                     .value_name("REPO")
+                                     .required(true)
+                                     .help("Name of repository to configure"))
+                                .arg(Arg::new("autocreate")
+                                     .short('a')
+                                     .long("autocreate")
+                                     .value_name("YES/NO")
+                                     .help("Set autocreation")
+                                     .value_parser(value_parser!(HumanBool)))
+                                .arg(Arg::new("disable")
+                                     .short('D')
+                                     .long("disable")
+                                     .value_name("YES/NO")
+                                     .help("Disable repository")
+                                     .value_parser(value_parser!(HumanBool)))
+                                .arg(Arg::new("options")
+                                     .action(ArgAction::Append)
+                                     .value_name("OPTION=VALUE")
+                                     .help("Type-specific options, in option=value form")))
+                    .subcommand(Command::new("remove")
+                                .visible_aliases(["rm"])
+                                .about("Remove a repository")
+                                .arg(Arg::new("repo")
+                                     .help("Name of repository")
+                                     .value_name("REPO")
+                                     .required(true)))
+                    .subcommand(Command::new("show")
+                                .visible_aliases(["describe"])
+                                .about("Show information about a repository")
+                                .arg(Arg::new("repo")
+                                     .help("Name of repository")
+                                     .value_name("REPO")
+                                     .required(true))))
+        .subcommand(Command::new("group")
+                    .about("Create and manage groups of repositories")
+                    .subcommand_required(true)
+                    .subcommand(Command::new("create")
+                                .about("Create a group")
+                                .arg(Arg::new("group")
+                                     .help("Name of group")
+                                     .required(true)
+                                     .value_name("GROUP")))
+                    .subcommand(Command::new("delete")
+                                .visible_aliases(["drop"])
+                                .about("Delete a group.")
+                                .arg(Arg::new("group")
+                                     .help("Name of group")
+                                     .required(true)
+                                     .value_name("GROUP")))
+                    .subcommand(Command::new("add")
+                                .about("Add a repo to a group")
+                                .arg(Arg::new("name")
+                                     .help("Name of group")
+                                     .required(true)
+                                     .value_name("GROUP"))
+                                .arg(Arg::new("repo")
+                                     .value_name("NAME")
+                                     .required(true)
+                                     .help("Name of repository"))
+                    )
+                    .subcommand(Command::new("act")
+                                .about("Add an action to a group")
+                                .arg(Arg::new("group")
+                                     .help("Name of group")
+                                     .required(true)
+                                     .value_name("GROUP"))
+                                .arg(Arg::new("action")
+                                     .help("Name of action")
+                                     .required(true)
+                                     .value_name("ACTION")))
+                    .subcommand(Command::new("remove")
+                                .about("Remove a repo from a group")
+                                .arg(Arg::new("group")
+                                     .help("Name of group")
+                                     .required(true)
+                                     .value_name("GROUP"))
+                                .arg(Arg::new("action")
+                                     .help("Name of action")
+                                     .required(true)
+                                     .value_name("ACTION")))
+                    .subcommand(Command::new("show")
+                                .about("Show information about a group")
+                                .arg(Arg::new("group")
+                                     .help("Name of group")
+                                     .required(true)
+                                     .value_name("GROUP")))
+                    .subcommand(Command::new("list")
+                                .about("List known groups")))
+        .subcommand(Command::new("type")
+                    .about("Create and manage repository types")
+                    .subcommand_required(true)
+                    .subcommand(Command::new("create")
+                                .about("Create a new repository type")
+                                .arg(Arg::new("type")
+                                     .help("Name of type")
+                                     .required(true)
+                                     .value_name("TYPE"))
+                                .arg(Arg::new("description")
+                                     .short('d')
+                                     .long("description")
+                                     .help("Description of repository type")
+                                     .value_name("DESCRIPTION"))
+                                .arg(Arg::new("create")
+                                     .short('c')
+                                     .long("create")
+                                     .help("Creation command")
+                                     .value_name("COMMAND"))
+                                .arg(Arg::new("inward")
+                                     .short('i')
+                                     .long("inward")
+                                     .help("Inward sync command")
+                                     .value_name("COMMAND"))
+                                .arg(Arg::new("outward")
+                                     .short('o')
+                                     .long("outward")
+                                     .help("Outward sync command")
+                                     .value_name("COMMAND"))
+                                .arg(Arg::new("status")
+                                     .short('s')
+                                     .long("status")
+                                     .help("Status command")
+                                     .value_name("COMMAND"))
+                                .arg(Arg::new("pre_inward")
+                                     .long("pre-inward")
+                                     .help("Pre-inward command")
+                                     .value_name("COMMAND"))
+                                .arg(Arg::new("post_inward")
+                                     .long("post-inward")
+                                     .help("Post-inward command")
+                                     .value_name("COMMAND"))
+                                .arg(Arg::new("post_outward")
+                                     .long("post-outward")
+                                     .help("Post-outward command")
+                                     .value_name("COMMAND"))
+                    )
+                    .subcommand(Command::new("config")
+                                .about("Configure a repository type")
+                                .arg(Arg::new("type")
+                                     .help("Name of type")
+                                     .required(true)
+                                     .value_name("TYPE"))
+                                .arg(Arg::new("description")
+                                     .short('d')
+                                     .long("description")
+                                     .help("Description of repository type")
+                                     .value_name("DESCRIPTION"))
+                                .arg(Arg::new("create")
+                                     .short('c')
+                                     .long("create")
+                                     .help("Creation command")
+                                     .value_name("COMMAND"))
+                                .arg(Arg::new("inward")
+                                     .short('i')
+                                     .long("inward")
+                                     .help("Inward sync command")
+                                     .value_name("COMMAND"))
+                                .arg(Arg::new("outward")
+                                     .short('o')
+                                     .long("outward")
+                                     .help("Outward sync command")
+                                     .value_name("COMMAND"))
+                                .arg(Arg::new("status")
+                                     .short('s')
+                                     .long("status")
+                                     .help("Status command")
+                                     .value_name("COMMAND"))
+                                .arg(Arg::new("pre_inward")
+                                     .long("pre-inward")
+                                     .help("Pre-inward command")
+                                     .value_name("COMMAND"))
+                                .arg(Arg::new("post_inward")
+                                     .long("post-inward")
+                                     .help("Post-inward command")
+                                     .value_name("COMMAND"))
+                                .arg(Arg::new("post_outward")
+                                     .long("post-outward")
+                                     .help("Post-outward command")
+                                     .value_name("COMMAND")))
+                    .subcommand(Command::new("command")
+                                .about("Manage commands in a repository type")
+                                .subcommand_required(true)
+                                .subcommand(Command::new("add")
+                                            .about("Add a command to a repository type")
+                                            .arg(Arg::new("type")
+                                                 .help("Name of type")
+                                                 .required(true)
+                                                 .value_name("TYPE"))
+                                            .arg(Arg::new("name")
+                                                 .help("Name of command")
+                                                 .required(true)
+                                                 .value_name("NAME"))
+                                            .arg(Arg::new("command")
+                                                 .help("Command")
+                                                 .required(true)
+                                                 .value_name("COMMAND")))
+                                .subcommand(Command::new("change")
+                                            .about("Change a command in a repository type")
+                                            .arg(Arg::new("type")
+                                                 .help("Name of type")
+                                                 .required(true)
+                                                 .value_name("TYPE"))
+                                            .arg(Arg::new("name")
+                                                 .help("Name of command")
+                                                 .required(true)
+                                                 .value_name("NAME"))
+                                            .arg(Arg::new("command")
+                                                 .help("Command")
+                                                 .required(true)
+                                                 .value_name("COMMAND")))
+                                .subcommand(Command::new("remove")
+                                            .about("Remove a command from a repository type")
+                                            .arg(Arg::new("type")
+                                                 .help("Name of type")
+                                                 .required(true)
+                                                 .value_name("TYPE"))
+                                            .arg(Arg::new("name")
+                                                 .help("Name of command")
+                                                 .required(true)
+                                                 .value_name("NAME")))
+                    )
+                    .subcommand(Command::new("show")
+                                .about("Show information about a repository type")
+                                .arg(Arg::new("type")
+                                     .help("Name of type")
+                                     .required(true)
+                                     .value_name("TYPE")))
+                    .subcommand(Command::new("list")
+                                .about("List known repository types")))
+        .subcommand(Command::new("action")
+                    .about("Create and manage actions")
+                    .subcommand_required(true)
+                    .subcommand(Command::new("create")
+                                .about("Create a new action")
+                                .arg(Arg::new("action")
+                                     .help("Name of action")
+                                     .required(true)
+                                     .value_name("ACTION"))
+                                .arg(Arg::new("command")
+                                     .help("Command")
+                                     .required(true)
+                                     .value_name("COMMAND"))
+                                .arg(Arg::new("description")
+                                     .help("Description of action")
+                                     .long("description")
+                                     .short('d')
+                                     .value_name("DESCRIPTION")))
+                    .subcommand(Command::new("config")
+                                .about("Configure an action")
+                                .arg(Arg::new("action")
+                                     .help("Name of action")
+                                     .required(true)
+                                     .value_name("ACTION"))
+                                .arg(Arg::new("disable")
+                                     .short('D')
+                                     .long("disable")
+                                     .value_name("YES/NO")
+                                     .help("Disable action")
+                                     .value_parser(value_parser!(HumanBool)))
+                                .arg(Arg::new("command")
+                                     .help("Command")
+                                     .long("command")
+                                     .short('c')
+                                     .value_name("COMMAND"))
+                                .arg(Arg::new("description")
+                                     .help("Description of action")
+                                     .long("description")
+                                     .short('d')
+                                     .value_name("DESCRIPTION")))
+                    .subcommand(Command::new("show")
+                                .about("Show information about an action")
+                                .arg(Arg::new("action")
+                                     .help("Name of action")
+                                     .required(true)
+                                     .value_name("ACTION")))
+                    .subcommand(Command::new("list")
+                                .about("List known actions")))
+        .subcommand(Command::new("completion")
+                    .about("Generate completions for command.")
+                    .arg(Arg::new("shell")
+                         .value_name("SHELL")
+                         .help("Which shell to generate completions for")
+                         .required(true)
+                         .value_parser(value_parser!(Shell))))
+}
+
+
+fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {
+    generate(gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
+}
+
+
 fn main() {
-    let yaml = load_yaml!("cli.yml");
-    let matches = App::from_yaml(yaml).version(crate_version!()).get_matches();
 
-    let config_file = find_config_file(matches.value_of("config"));
+    let matches = build_cli().get_matches();
+
+    let config_file = find_config_file(matches.get_one::<String>("config"));
     let mut configuration: Config = read_configuration_file(&config_file);
-
-    if matches.is_present("config") {
+    if matches.get_one::<String>("config").is_some() {
         configuration.is_not_default = true;
-        configuration.base_path = Path::new(matches.value_of("config").unwrap()).canonicalize().unwrap().parent().unwrap().to_path_buf();
+        configuration.base_path = config_file.canonicalize().unwrap().parent().unwrap().to_path_buf();
     }
 
-    match matches.subcommand_name() {
-        Some("run") => if let Some(matches) = matches.subcommand_matches("run") {
-            if matches.is_present("command") {
-                println!("Running with command");
-                run::run_with_command(&configuration, matches.value_of("command").unwrap().to_string(),
-                                      matches.values_of("name").unwrap());
-            } else {
-                run::run(&configuration, matches.values_of("name").unwrap());
+    match matches.subcommand() {
+        Some(("completion", subm)) => {
+            let mut cmd = build_cli();
+            if let Some(generator) = subm.get_one::<Shell>("shell").copied() {
+                print_completions(generator, &mut cmd);
             }
-        },
-        Some("repository") => if let Some(matches) = matches.subcommand_matches("repository") {
-            match matches.subcommand_name() {
-                Some("register") => if let Some(matches) = matches.subcommand_matches("register") {
-                    let type_name = matches.value_of("type").unwrap().to_string();
+        }
+        Some(("run", subm)) => {
+            let repos: Vec<&str> = subm.get_many::<String>("repo")
+                .expect("At least one repository/group must be specified.")
+                .map(|s| s.as_str()).collect();
+
+            if let Some(command) = subm.get_one::<String>("command") {
+                run::run_with_command(&configuration, command, repos);
+            } else {
+                run::run(&configuration, repos);
+            }
+        }
+        Some(("repository", subm)) => {
+            match subm.subcommand() {
+                Some(("register", subm)) => {
+                    let type_name = subm.get_one::<String>("type_name").expect("A type name must be provided").to_string();
                     let location = match configuration.is_not_default {
                         true => env::current_dir().unwrap().strip_prefix(&configuration.base_path).unwrap().to_path_buf(),
-                        _ => env::current_dir().unwrap(),
+                        _ => env::current_dir().unwrap()
                     };
-                    let location_string = location.to_str().unwrap().to_string();
-                    let name = match matches.value_of("name") {
-                        Some(string) => string.to_string(),
+                    let location_str = location.to_str().unwrap().to_string();
+                    let name = match subm.get_one::<String>("name") {
+                        Some(name) => name.to_string(),
                         None => location.file_name().unwrap().to_str().unwrap().to_string()
                     };
                     let mut option_strings: Vec<String> = Vec::new();
-                    match matches.values_of("options") {
-                        Some(option_strings_in) => {
-                            for str_thing in option_strings_in {
-                                option_strings.push(str_thing.to_string())
+                    match subm.get_many::<String>("options") {
+                        Some(option) => {
+                            for string in option {
+                                option_strings.push(string.to_string())
                             }
-                        },
+                        }
                         None => {}
                     }
-                    repository::register(&mut configuration, &name, location_string, type_name, option_strings);
-                },
-                Some("config") => if let Some(matches) = matches.subcommand_matches("config") {
-                    let name = matches.value_of("name").unwrap().to_string();
-                    if let Some(options) = matches.values_of("options") {
+                    repository::register(&mut configuration, &name, location_str, type_name, option_strings);
+                }
+                Some(("config", subm)) => {
+                    let repo = subm.get_one::<String>("repo").expect("A repository name must be provided").to_string();
+                    if let Some(options) = subm.get_many::<String>("options") {
                         let mut option_strings: Vec<String> = Vec::new();
                         for str_thing in options {
                             option_strings.push(str_thing.to_string())
                         }
-                        repository::update_options(&mut configuration, &name, option_strings);
+                        repository::update_options(&mut configuration, &repo, option_strings);
                     }
-                    match matches.value_of("autocreate") {
-                        Some("YES") => repository::update_autocreate(&mut configuration, &name, true),
-                        Some("NO") => repository::update_autocreate(&mut configuration, &name, false),
+                    match subm.get_one::<HumanBool>("autocreate") {
+                        Some(HumanBool::Yes) => repository::update_autocreate(&mut configuration, &repo, true),
+                        Some(HumanBool::No) => repository::update_autocreate(&mut configuration, &repo, false),
                         _ => {}
                     }
-                    match matches.value_of("disable") {
-                        Some("YES") => repository::update_disabled(&mut configuration, &name, true),
-                        Some("NO") => repository::update_disabled(&mut configuration, &name, false),
+                    match subm.get_one::<HumanBool>("disable") {
+                        Some(HumanBool::Yes) => repository::update_disabled(&mut configuration, &repo, true),
+                        Some(HumanBool::No) => repository::update_disabled(&mut configuration, &repo, false),
                         _ => {}
                     }
-                },
-                Some("remove") => if let Some(matches) = matches.subcommand_matches("remove") {
-                    let name = matches.value_of("name").unwrap().to_string();
-                    repository::remove_repo(&mut configuration, &name);
-                },
-                Some("show") => if let Some(matches) = matches.subcommand_matches("show") {
-                    let name = matches.value_of("name").unwrap().to_string();
-                    let repository = configuration.repositories.get(&name);
-                    match repository {
-                        Some(repository) => println!("{}", repository),
-                        None => eprintln!("No known repository named \"{}\".", name)
-                    }
-                },
-                Some("list") => {
+                }
+                Some(("remove", subm)) => {
+                    let repo = subm.get_one::<String>("repo").expect("A repository name must be provided").to_string();
+                    repository::remove_repo(&mut configuration, &repo);
+                }
+                Some(("list", _subm)) => {
                     for key in configuration.repositories.keys() {
                         println!(" - {}", key);
                     }
                 }
-                _ => panic!("Something has gone horribly wrong...")
+                Some(("show", subm)) => {
+                    let repo = subm.get_one::<String>("repo").expect("A repository name must be provided").to_string();
+                    let repository = configuration.repositories.get(&repo);
+                    match repository {
+                        Some(repository) => println!("{}", repository),
+                        None => eprintln!("No known repository named \"{}\".", repo)
+                    }
+                }
+                _ => {
+                    panic!("This should never happen...")
+                }
             }
-        },
-        Some("action") => if let Some(matches) = matches.subcommand_matches("action") {
-            match matches.subcommand_name() {
-                Some("create") => if let Some(matches) = matches.subcommand_matches("create") {
-                    let name = matches.value_of("name").unwrap().to_string();
-                    let command = matches.value_of("command").unwrap().to_string();
-                    let description = match matches.value_of("description") {
-                        Some(string) => string.to_string(),
-                        _ => String::from("")
-                    };
-                    action::add(&mut configuration, &name, &description, &command);
-                },
-                Some("config") => if let Some(matches) = matches.subcommand_matches("config") {
-                    let name = matches.value_of("name").unwrap().to_string();
-                    match matches.value_of("disabled") {
-                        Some("YES") => action::update_disabled(&mut configuration, &name, true),
-                        Some("NO") => action::update_disabled(&mut configuration, &name, false),
+        }
+        Some(("group", subm)) => {
+            match subm.subcommand() {
+                Some(("create", subm)) => {
+                    let group = subm.get_one::<String>("group").expect("A group name must be provided.").to_string();
+                    group::add(&mut configuration, &group);
+                }
+                Some(("delete", subm)) => {
+                    let group = subm.get_one::<String>("group").expect("A group name must be provided.").to_string();
+                    group::remove_group(&mut configuration, &group);
+                }
+                Some(("add", subm)) => {
+                    let group = subm.get_one::<String>("group").expect("A group name must be provided.").to_string();
+                    let repo = subm.get_one::<String>("repo").expect("A repository name must be provided.").to_string();
+                    group::add_repo(&mut configuration, &group, &repo)
+                }
+                Some(("act", subm)) => {
+                    let group = subm.get_one::<String>("group").expect("A group name must be provided.").to_string();
+                    let action = subm.get_one::<String>("action").expect("An action name must be provided").to_string();
+                    group::add_action(&mut configuration, &group, &action);
+                }
+                Some(("remove", subm)) => {
+                    let group = subm.get_one::<String>("group").expect("A group name must be provided.").to_string();
+                    let repo = subm.get_one::<String>("repo").expect("A repository name must be provided.").to_string();
+                    group::remove_repo(&mut configuration, &group, &repo)
+                }
+                Some(("show", subm)) => {
+                    let group_name = subm.get_one::<String>("group").expect("A group name must be provided.").to_string();
+                    let group = configuration.groups.get(&group_name);
+                    match group {
+                        Some(group) => println!("{}", group),
+                        None => eprintln!("No known group named \"{}\".", group_name)
+                    }
+                }
+                Some(("list", _subm)) => {}
+                _ => {
+                    panic!("This should never happen...")
+                }
+            }
+        }
+        Some(("type", subm)) => {
+            match subm.subcommand() {
+                Some(("create", subm)) => {
+                    let tname = subm.get_one::<String>("type").expect("A type name must be provided").to_string();
+                    let temp_string = "".to_string();
+                    let description = subm.get_one::<String>("description").unwrap_or(&temp_string);
+                    let create = subm.get_one::<String>("create").unwrap_or(&temp_string);
+                    let inward = subm.get_one::<String>("inward").unwrap_or(&temp_string);
+                    let outward = subm.get_one::<String>("outward").unwrap_or(&temp_string);
+                    let status = subm.get_one::<String>("status").unwrap_or(&temp_string);
+                    let pre_inward = subm.get_one::<String>("pre_inward").unwrap_or(&temp_string);
+                    let post_inward = subm.get_one::<String>("post_inward").unwrap_or(&temp_string);
+                    let post_outward = subm.get_one::<String>("post_outward").unwrap_or(&temp_string);
+                    repotype::add(&mut configuration, &tname, &description, &create, &inward, &outward, &status, &pre_inward, &post_inward, &post_outward);
+                }
+                Some(("config", subm)) => {
+                    let tname = subm.get_one::<String>("type").expect("A type name must be provided").to_string();
+                    match subm.get_one::<String>("description") {
+                        Some(description) => repotype::update_description(&mut configuration, &tname, &description.to_string()),
                         _ => {}
                     }
-                    match matches.value_of("command") {
+                    match subm.get_one::<String>("create") {
+                        Some(create) => repotype::update_create(&mut configuration, &tname, &create.to_string()),
+                        _ => {}
+                    }
+                    match subm.get_one::<String>("inward") {
+                        Some(inward) => repotype::update_inward(&mut configuration, &tname, &inward.to_string()),
+                        _ => {}
+                    }
+                    match subm.get_one::<String>("outward") {
+                        Some(outward) => repotype::update_outward(&mut configuration, &tname, &outward.to_string()),
+                        _ => {}
+                    }
+                    match subm.get_one::<String>("status") {
+                        Some(status) => repotype::update_status(&mut configuration, &tname, &status.to_string()),
+                        _ => {}
+                    }
+                    match subm.get_one::<String>("pre_inward") {
+                        Some(pre_inward) => repotype::update_pre_inward(&mut configuration, &tname, &pre_inward.to_string()),
+                        _ => {}
+                    }
+                    match subm.get_one::<String>("post_inward") {
+                        Some(post_inward) => repotype::update_post_inward(&mut configuration, &tname, &post_inward.to_string()),
+                        _ => {}
+                    }
+                    match subm.get_one::<String>("post_outward") {
+                        Some(post_outward) => repotype::update_post_outward(&mut configuration, &tname, &post_outward.to_string()),
+                        _ => {}
+                    }
+                }
+                Some(("command", subm)) => {
+                    match subm.subcommand() {
+                        Some(("add", subm)) => {
+                            let type_name = subm.get_one::<String>("type").expect("A type name is required").to_string();
+                            let name = subm.get_one::<String>("name").expect("A name is required").to_string();
+                            let command = subm.get_one::<String>("command").expect("A command is required").to_string();
+                            repotype::add_command(&mut configuration, &type_name, &name, &command);
+                        },
+                        Some(("change", subm)) => {
+                            let type_name = subm.get_one::<String>("type").expect("A type name is required").to_string();
+                            let name = subm.get_one::<String>("name").expect("A name is required").to_string();
+                            let command = subm.get_one::<String>("command").expect("A command is required").to_string();
+                            repotype::change_command(&mut configuration, &type_name, &name, &command);
+                        },
+                        Some(("remove", subm)) => {
+                            let type_name = subm.get_one::<String>("type").expect("A type name is required").to_string();
+                            let name = subm.get_one::<String>("name").expect("A name is required").to_string();
+                            repotype::remove_command(&mut configuration, &type_name, &name);
+                        },
+                        _ => panic!("Something has gone horribly wrong...")
+                    }
+                }
+                Some(("show", subm)) => {
+                    let tname = subm.get_one::<String>("type").expect("A type name is required").to_string();
+                    let repo_type = configuration.repo_types.get(&tname);
+                    match repo_type {
+                        Some(repo_type) => println!("{}", repo_type),
+                        None => eprintln!("No known repo type named \"{}\".", tname)
+                    }
+                }
+                Some(("list", _subm)) => {
+                    for key in configuration.repo_types.keys() {
+                        println!(" - {}", key);
+                    }
+                }
+                _ => {
+                    panic!("This should never happen...")
+                }
+            }
+        }
+        Some(("action", subm)) => {
+            match subm.subcommand() {
+                Some(("create", subm)) => {
+                    let name = subm.get_one::<String>("action").expect("An action name is required").to_string();
+                    let command = subm.get_one::<String>("command").expect("A command is required").to_string();
+                    let temp_string = "".to_string();
+                    let description = subm.get_one::<String>("Description").unwrap_or(&temp_string);
+                    action::add(&mut configuration, &name, &description, &command);
+                }
+                Some(("config", subm)) => {
+                    let name = subm.get_one::<String>("action").expect("An action name is required").to_string();
+                    match subm.get_one::<HumanBool>("disabled") {
+                        Some(HumanBool::Yes) => action::update_disabled(&mut configuration, &name, true),
+                        Some(HumanBool::No) => action::update_disabled(&mut configuration, &name, false),
+                        _ => {}
+                    }
+                    match subm.get_one::<String>("command") {
                         Some(command) => action::update_command(&mut configuration, &name, &command.to_string()),
                         _ => {}
                     }
-                    match matches.value_of("description") {
+                    match subm.get_one::<String>("description") {
                         Some(description) => action::update_description(&mut configuration, &name, &description.to_string()),
                         _ => {}
                     }
-                },
-                Some("show") => if let Some(matches) = matches.subcommand_matches("show") {
-                    let name = matches.value_of("name").unwrap().to_string();
+                }
+                Some(("show", subm)) => {
+                    let name = subm.get_one::<String>("action").expect("An action name is required").to_string();
                     let action = configuration.actions.get(&name);
                     match action {
                         Some(action) => println!("{}", action),
                         None => eprintln!("No known action named \"{}\".", name)
                     }
-                },
-                Some("list") => {
+                }
+                Some(("list", _subm)) => {
                     for key in configuration.actions.keys() {
                         println!(" - {}", key);
                     }
                 }
-                _ => panic!("Something has gone horribly wrong...")
-            }
-        },
-        Some("group") => if let Some(matches) = matches.subcommand_matches("group") {
-            match matches.subcommand_name() {
-                Some("create") => if let Some(matches) = matches.subcommand_matches("create") {
-                    let name = matches.value_of("name").unwrap().to_string();
-                    group::add(&mut configuration, &name);
-                },
-                Some("add") => if let Some(matches) = matches.subcommand_matches("add") {
-                    let name = matches.value_of("name").unwrap().to_string();
-                    let repo = matches.value_of("repo").unwrap().to_string();
-                    group::add_repo(&mut configuration, &name, &repo);
-                },
-                Some("act") => if let Some(matches) = matches.subcommand_matches("act") {
-                    let name = matches.value_of("name").unwrap().to_string();
-                    let action = matches.value_of("action").unwrap().to_string();
-                    group::add_action(&mut configuration, &name, &action);
-                },
-                Some("remove") => if let Some(matches) = matches.subcommand_matches("remove") {
-                    let name = matches.value_of("name").unwrap().to_string();
-                    let repo = matches.value_of("repo").unwrap().to_string();
-                    group::remove_repo(&mut configuration, &name, &repo);
-                },
-                Some("drop") => if let Some(matches) = matches.subcommand_matches("drop") {
-                    let name = matches.value_of("name").unwrap().to_string();
-                    group::remove_group(&mut configuration, &name);
+                _ => {
+                    panic!("This should never happen...")
                 }
-                Some("show") => if let Some(matches) = matches.subcommand_matches("show") {
-                    let name = matches.value_of("name").unwrap().to_string();
-                    let group = configuration.groups.get(&name);
-                    match group {
-                        Some(group) => println!("{}", group),
-                        None => eprintln!("No known group named \"{}\".", name)
-                    }
-                },
-                Some("list") => {
-                    for key in configuration.groups.keys() {
-                        println!(" - {}", key);
-                    }
-                },
-                _ => panic!("Something has gone horribly wrong...")
             }
-        },
-        Some("type") => if let Some(matches) = matches.subcommand_matches("type") {
-            match matches.subcommand_name() {
-                Some("create") => if let Some(matches) = matches.subcommand_matches("create") {
-                    let name = matches.value_of("name").unwrap().to_string();
-                    let description = match matches.value_of("description") {
-                        Some(thing) => thing.to_string(),
-                        None => "".to_string()
-                    };
-                    let create = match matches.value_of("create") {
-                        Some(thing) => thing.to_string(),
-                        None => "".to_string()
-                    };
-                    let inward = match matches.value_of("inward") {
-                        Some(thing) => thing.to_string(),
-                        None => "".to_string()
-                    };
-                    let outward = match matches.value_of("outward") {
-                        Some(thing) => thing.to_string(),
-                        None => "".to_string()
-                    };
-                    let status = match matches.value_of("status") {
-                        Some(thing) => thing.to_string(),
-                        None => "".to_string()
-                    };
-                    let pre_inward = match matches.value_of("pre_inward") {
-                        Some(thing) => thing.to_string(),
-                        None => "".to_string()
-                    };
-                    let post_inward = match matches.value_of("post_inward") {
-                        Some(thing) => thing.to_string(),
-                        None => "".to_string()
-                    };
-                    let post_outward = match matches.value_of("post_outward") {
-                        Some(thing) => thing.to_string(),
-                        None => "".to_string()
-                    };
-                    repotype::add(&mut configuration, &name, &description, &create, &inward, &outward, &status, &pre_inward, &post_inward, &post_outward);
-                },
-                Some("config") => if let Some(matches) = matches.subcommand_matches("config") {
-                    let name = matches.value_of("name").unwrap().to_string();
-                    match matches.value_of("description") {
-                        Some(description) => repotype::update_description(&mut configuration, &name, &description.to_string()),
-                        _ => {}
-                    }
-                    match matches.value_of("create") {
-                        Some(create) => repotype::update_create(&mut configuration, &name, &create.to_string()),
-                        _ => {}
-                    }
-                    match matches.value_of("inward") {
-                        Some(inward) => repotype::update_inward(&mut configuration, &name, &inward.to_string()),
-                        _ => {}
-                    }
-                    match matches.value_of("outward") {
-                        Some(outward) => repotype::update_outward(&mut configuration, &name, &outward.to_string()),
-                        _ => {}
-                    }
-                    match matches.value_of("status") {
-                        Some(status) => repotype::update_status(&mut configuration, &name, &status.to_string()),
-                        _ => {}
-                    }
-                    match matches.value_of("pre_inward") {
-                        Some(pre_inward) => repotype::update_pre_inward(&mut configuration, &name, &pre_inward.to_string()),
-                        _ => {}
-                    }
-                    match matches.value_of("post_inward") {
-                        Some(post_inward) => repotype::update_post_inward(&mut configuration, &name, &post_inward.to_string()),
-                        _ => {}
-                    }
-                    match matches.value_of("post_outward") {
-                        Some(post_outward) => repotype::update_post_outward(&mut configuration, &name, &post_outward.to_string()),
-                        _ => {}
-                    }
-                },
-                Some("command") => if let Some(matches) = matches.subcommand_matches("command") {
-                    match matches.subcommand_name() {
-                        Some("add") => if let Some(matches) = matches.subcommand_matches("add") {
-                            let type_name = matches.value_of("type").unwrap().to_string();
-                            let name = matches.value_of("name").unwrap().to_string();
-                            let command = matches.value_of("command").unwrap().to_string();
-                            repotype::add_command(&mut configuration, &type_name, &name, &command);
-                        },
-                        Some("change") => if let Some(matches) = matches.subcommand_matches("change") {
-                            let type_name = matches.value_of("type").unwrap().to_string();
-                            let name = matches.value_of("name").unwrap().to_string();
-                            let command = matches.value_of("command").unwrap().to_string();
-                            repotype::change_command(&mut configuration, &type_name, &name, &command);
-                        },
-                        Some("remove") => if let Some(matches) = matches.subcommand_matches("remove") {
-                            let type_name = matches.value_of("type").unwrap().to_string();
-                            let name = matches.value_of("name").unwrap().to_string();
-                            repotype::remove_command(&mut configuration, &type_name, &name);
-                        },
-                        _ => panic!("Something has gone horribly wrong...")
-                    }
-                },
-                Some("show") => if let Some(matches) = matches.subcommand_matches("show") {
-                    let name = matches.value_of("name").unwrap().to_string();
-                    let repo_type = configuration.repo_types.get(&name);
-                    match repo_type {
-                        Some(repo_type) => println!("{}", repo_type),
-                        None => eprintln!("No known repo type named \"{}\".", name)
-                    }
-                },
-                Some("list") => {
-                    for key in configuration.repo_types.keys() {
-                        println!(" - {}", key);
-                    }
-                },
-                _ => panic!("Something has gone horribly wrong...")
-            }
-        },
-        Some(thing) => println!("{}", thing),
-        _ => println!("No subcommand."),
+        }
+        _ => {
+            panic!("This should never happen...")
+        }
     }
 
+    
     match write_configuration_file(config_file, configuration) {
         Err(err) => panic!("Error writing configuration: {}.", err),
         _ => {}

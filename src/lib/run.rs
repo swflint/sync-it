@@ -1,4 +1,3 @@
-use clap::Values;
 use crate::lib::config::Config;
 
 use string_template::Template;
@@ -7,7 +6,7 @@ use std::process::Command;
 use std::path::Path;
 use std::collections::HashMap;
 
-pub fn run(config: &Config, names: Values<'_>) {
+pub fn run(config: &Config, names: Vec<&str>) {
     for name in names {
         if config.repositories.contains_key(name) {
             run_repository_sync(&config, name.to_string());
@@ -23,7 +22,7 @@ pub fn run(config: &Config, names: Values<'_>) {
     }
 }
 
-pub fn run_with_command(config: &Config, command: String, names: Values<'_>) {
+pub fn run_with_command(config: &Config, command: &String, names: Vec<&str>) {
     for name in names {
         if config.repositories.contains_key(name) {
             run_named_command(&config, name.to_string(), &command);

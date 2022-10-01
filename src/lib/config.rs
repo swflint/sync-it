@@ -44,7 +44,7 @@ pub struct Config {
     pub groups: BTreeMap<String, Group>,
 }
 
-pub fn find_config_file(original: Option<&str>) -> PathBuf {
+pub fn find_config_file(original: Option<&String>) -> PathBuf {
     match original {
         None => {
             let config_name = PathBuf::from(".config/sync-it/config.toml");
