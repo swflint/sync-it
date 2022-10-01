@@ -21,7 +21,7 @@
 
             src = ./.;
 
-            cargoSha256 = "B4CyfXY1IXJ4M8qk5Ba5CFglKbNxJoY8e+pakwc1opk=";
+            cargoSha256 = "B8N7fgi8RTXXzVYfqzbCB3ov6mDIJgFm6HEg3gCuVGA=";
 
             meta = {
               description = "A simple, customizable synchronization tool.";
