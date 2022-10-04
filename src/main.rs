@@ -163,7 +163,7 @@ fn build_cli() -> Command {
                                      .value_name("GROUP")))
                     .subcommand(Command::new("add")
                                 .about("Add a repo to a group")
-                                .arg(Arg::new("name")
+                                .arg(Arg::new("group")
                                      .help("Name of group")
                                      .required(true)
                                      .value_name("GROUP"))
