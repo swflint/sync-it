@@ -435,7 +435,7 @@ fn main() {
         Some(("repository", subm)) => {
             match subm.subcommand() {
                 Some(("register", subm)) => {
-                    let type_name = subm.get_one::<String>("type_name").expect("A type name must be provided").to_string();
+                    let type_name = subm.get_one::<String>("type").expect("A type name must be provided").to_string();
                     let location = match configuration.is_not_default {
                         true => env::current_dir().unwrap().strip_prefix(&configuration.base_path).unwrap().to_path_buf(),
                         _ => env::current_dir().unwrap()
