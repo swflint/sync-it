@@ -1,4 +1,6 @@
-// extern crate clap;
+// SPDX-FileCopyrightText: 2021 - 2022 Samuel W. Flint <swflint@flintfam.org>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 use clap::{Command, command, Arg, value_parser, ArgAction, ValueEnum, builder::PossibleValue};
 use clap_complete::{generate, Generator, Shell};
@@ -70,6 +72,8 @@ fn build_cli() -> Command {
         .propagate_version(true)
         .subcommand_required(true)
         .author("Samuel W. Flint <swflint@flintfam.org>")
+	.after_help("License under the GNU GPL v3.0 or later (https://spdx.org/licenses/GPL-3.0-or-later.html)")
+	.after_long_help("License under the GNU GPL v3.0 or later (https://spdx.org/licenses/GPL-3.0-or-later.html)")
         .about("Synchronize directories flexibly")
         .arg(Arg::new("config")
              .short('c')

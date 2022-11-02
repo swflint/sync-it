@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 - 2022 Samuel W. Flint <swflint@flintfam.org>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 use crate::lib::config::Config;
 
 use string_template::Template;

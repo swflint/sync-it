@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 - 2022 Samuel W. Flint <swflint@flintfam.org>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 pub fn rename_repository(config: &mut Config, name: &String, newName: &String) {
     let mut repo = config.repositories.get_mut(&name.to_string());
     match repo {

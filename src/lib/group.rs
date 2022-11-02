@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 - 2022 Samuel W. Flint <swflint@flintfam.org>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::collections::BTreeSet;
