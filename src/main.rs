@@ -535,7 +535,11 @@ fn main() {
                         None => eprintln!("No known group named \"{}\".", group_name)
                     }
                 }
-                Some(("list", _subm)) => {}
+                Some(("list", _subm)) => {
+                    for key in configuration.groups.keys() {
+                        println!(" - {}", key);
+                    }
+                }
                 _ => {
                     panic!("This should never happen...")
                 }

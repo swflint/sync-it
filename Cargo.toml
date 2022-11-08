@@ -4,7 +4,7 @@
 
 [package]
 name = "sync-it"
-version = "2.1.2"
+version = "2.2.0"
 authors = ["Samuel W. Flint <swflint@flintfam.org>"]
 edition = "2018"
 license = "GPL-3.0-or-later"
